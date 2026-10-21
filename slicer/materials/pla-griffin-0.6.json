@@ -15,7 +15,7 @@
     "filament_flush_volume": "0",
     "filament_infill_max_crossing_speed": "0",
     "filament_infill_max_speed": "0",
-    "filament_max_volumetric_speed": "0",
+    "filament_max_volumetric_speed": "25",
     "filament_seam_gap_distance": "nil",
     "filament_shrinkage_compensation_xy": "0%",
     "filament_shrinkage_compensation_z": "0%",

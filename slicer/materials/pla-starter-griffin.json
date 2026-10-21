@@ -2,5 +2,5 @@
   "name": "Hjort Creations - PLA - Griffin",
   "base": "addnorth-epla-griffin-0.8",
   "pressure_advance": 0.015,
-  "settings": {"filament_vendor": "Generic", "filament_cost": "0", "extrusion_multiplier": "1", "filament_max_volumetric_speed": "30", "slowdown_below_layer_time": "45", "min_print_speed": "5", "disable_fan_first_layers": "2", "full_fan_speed_layer": "5"}
+  "settings": {"filament_vendor": "Generic", "filament_cost": "0", "extrusion_multiplier": "1", "filament_max_volumetric_speed": "25", "slowdown_below_layer_time": "45", "min_print_speed": "5", "disable_fan_first_layers": "2", "full_fan_speed_layer": "5"}
 }

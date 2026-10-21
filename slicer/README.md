@@ -6,7 +6,7 @@ The printer's own preset supplies its work envelope, hardware limits and calibra
 
 ## Download and import the starter bundle
 
-**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.1/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.2/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 1. In PrusaSlicer 2.9.6, choose **File > Import > Import Config Bundle** and select the downloaded file.
 2. Select your **Hjort Creations - model - head/nozzle** printer preset.
@@ -39,7 +39,7 @@ These are single-tool Cartesian RRF starting presets, not IDEX or complete GEN5 
 
 | PLA preset | Default nozzle, mm | Max flow, mm³/s | First / normal temperature, °C | Starting PA |
 |---|---|---|---|---|
-| Griffin | 0.8 | 30 | 235 / 225 | 0.015 |
+| Griffin | 0.8 | 25 | 235 / 225 | 0.015 |
 | Griffin High-Flow | 0.8 | 40 | 235 / 225 | 0.015 |
 | Griffin ULTRA | 1.4 | 80 | 235 / 215 | 0.035 |
 

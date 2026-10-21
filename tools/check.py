@@ -198,7 +198,7 @@ def starter_checks():
     assert process['automatic_extrusion_widths']=='1'
     assert all(v=='0' for k,v in process.items() if k.endswith(('_extrusion_width','_acceleration')))
     assert process['max_volumetric_speed']=='0'
-    assert sorted(float(v['filament_max_volumetric_speed']) for v in filaments.values())==[30,40,80]
+    assert sorted(float(v['filament_max_volumetric_speed']) for v in filaments.values())==[25,40,80]
     for value in filaments.values():
         assert value['slowdown_below_layer_time']=='45' and value['min_print_speed']=='5'
         assert value['bed_temperature']==value['first_layer_bed_temperature']=='0'

@@ -5,7 +5,7 @@
 - Compatibility statements must describe actual firmware, axes, probe and hardware requirements. Keep physical test coverage separate from compatibility; do not claim all printer types are supported.
 - Shared macros must be usable without a model/nozzle recipe. Print/material profiles must build without model, hardware or motion components. Keep machine geometry in the separate printer configuration.
 - The primary beginner download is one ready-to-import PrusaSlicer Config Bundle. Users must not build it. Keep model dimensions, head/nozzle settings, a shared print process and head-compatible PLA presets separate in source; never duplicate full printer configurations by hand.
-- Starter PLA presets target 45 s layer time. Griffin High-Flow uses a conservative 40 mm3/s PLA cap. Keep documented operator observations separate from provisional nozzle starting values.
+- Starter PLA presets target 45 s layer time. Griffin High-Flow uses a conservative 40 mm3/s PLA cap; ULTRA uses the operator's conservative 80 mm3/s starter value. Keep documented operator observations separate from provisional nozzle starting values.
 - Write repository documentation, code comments, user-facing messages and release notes in English.
 - Save text as UTF-8. Preserve arrows, punctuation and unit symbols without Windows-1252 conversion; tools/check.py rejects common encoding corruption.
 - This repository contains reusable components. Keep customer names, addresses, IP/MAC addresses, controller UIDs, CRM IDs, passwords, network settings and service notes in private local service records outside the repository.

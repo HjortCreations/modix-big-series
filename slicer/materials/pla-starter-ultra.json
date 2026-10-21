@@ -2,6 +2,6 @@
   "name": "Hjort Creations - PLA - Griffin ULTRA",
   "base": "formfutura-epla-ultra-1.8",
   "pressure_advance": 0.035,
-  "status": "Conservative prepared 60 mm3/s baseline for the new 1.4 mm starter. The operator's 100 mm3/s working result belongs to the separate 1.8 mm profile and is not a measured 1.4 mm result.",
-  "settings": {"filament_vendor": "Generic", "filament_max_volumetric_speed": "60", "filament_seam_gap_distance": "nil"}
+  "status": "Operator-requested conservative 80 mm3/s baseline for the 1.4 mm starter. The operator's 100 mm3/s working result belongs to the separate 1.8 mm profile; this build does not constitute a measured 1.4 mm result.",
+  "settings": {"filament_vendor": "Generic", "filament_max_volumetric_speed": "80", "filament_seam_gap_distance": "nil"}
 }

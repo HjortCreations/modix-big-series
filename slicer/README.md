@@ -6,7 +6,7 @@ The printer's own preset supplies its work envelope, hardware limits and calibra
 
 ## Download and import the starter bundle
 
-**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.0/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.1/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 1. In PrusaSlicer 2.9.6, choose **File > Import > Import Config Bundle** and select the downloaded file.
 2. Select your **Hjort Creations - model - head/nozzle** printer preset.
@@ -41,11 +41,11 @@ These are single-tool Cartesian RRF starting presets, not IDEX or complete GEN5 
 |---|---|---|---|---|
 | Griffin | 0.8 | 30 | 235 / 225 | 0.015 |
 | Griffin High-Flow | 0.8 | 40 | 235 / 225 | 0.015 |
-| Griffin ULTRA | 1.4 | 60 | 235 / 215 | 0.035 |
+| Griffin ULTRA | 1.4 | 80 | 235 / 215 | 0.035 |
 
 These are generic PLA starting values for tuning, not measured limits for every nozzle/material.
 High-Flow's conservative 40 mm³/s cap was requested by the operator; 60 is deliberately not used for High-Flow.
-ULTRA 1.4 starts at 60; the separate 1.8 mm profile retains the operator's 100 mm³/s working setting.
+ULTRA 1.4 starts at the operator's conservative 80 mm³/s value; the separate 1.8 mm profile retains the operator's 100 mm³/s working setting.
 All three target 45 s minimum layer time, 5 mm/s minimum print speed, no fan for the first two layers
 and full fan at layer 5. The speed floor can prevent achieving 45 s on very small layers; inspect cooling in preview.
 PLA temperatures, extrusion multiplier, PA and flow are intended to be tuned to the installed head/nozzle/material.

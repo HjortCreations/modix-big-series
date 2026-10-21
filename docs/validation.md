@@ -1,30 +1,30 @@
-# Provningsstatus
+# Validation status
 
-Komponenterna kommer från tidigare fungerande profiler och beställda makroändringar.
-Ingen maskin styrs av verktygen i detta repo.
+The components come from previously working profiles and requested macro changes.
+The tools in this repository do not operate a printer.
 
-- Gemensam start/slut: samma kommandoföljd som tidigare; siffervärden väljs från komponenterna.
-- U-kärna och stop.g: återanvända från senaste gemensamma källorna. Retraktionsvillkor, Z-max och X1Y1 bevaras.
-- ULTRA 1,8 mm: operatören rapporterar fungerande 100 mm³/s, 235/215 °C och PA0,035. Detta är ingen uppmätt maximal materialkapacitet.
-- Villkorlig U-tilt har tidigare provats fysiskt i en fyrmotorig installation. Det bevisar inte att varje ny kombination är driftsatt.
-- Nya rena paket: byggda/kontrollerade offline. Inga systemfiler har laddats upp och ingen firmware har startats om under migreringen.
-- Den nyligen införda enkla Y-max/X-min-passagen och senaste X1Y1-avslutet ska fortfarande observeras fysiskt i respektive installation.
+- Shared start/end G-code retains the existing command sequence; numeric values come from the selected components.
+- The U-tilt core and stop.g reuse the latest shared sources. Retraction conditions, Z-max handling and X1 Y1 parking are preserved.
+- For ULTRA 1.8 mm, the operator reports working settings of 100 mm³/s, 235/215 °C and PA 0.035. These are not measured maximum-throughput results.
+- Conditional U-tilt was previously tested physically on one four-Z-motor installation. This does not establish commissioning of every new combination.
+- The new packages have been built and checked offline. No system files were uploaded and no firmware was restarted during migration.
+- The recently introduced X-min/Y-max single-pass homing and latest X1 Y1 end sequence still require physical observation on each installation.
 
-## Reproducerbara kontroller
+## Reproducible checks
 
-python tools/check.py kontrollerar sammansättning, gemensamma källor, integritet,
-U-geometri vid olika prob-/axelgränser, positiv och begränsad Z-parkering, varm
-retraktion, cachevillkor och att ULTRA-process/material återanvänds på olika storlekar.
-GitHub Actions kör samma kontroll och bygger paketen.
+python tools/check.py checks composition, shared sources, privacy,
+U-tilt geometry across probe offsets and axis limits, positive and bounded Z parking,
+warm-tool retraction, cache conditions, and reuse of ULTRA process/material settings across machine sizes.
+GitHub Actions runs the same checks and builds the packages.
 
-Verklig slicerkontroll görs med PrusaSlicer 2.9.6:
+Run actual slicer validation with PrusaSlicer 2.9.6:
 
 ```console
 python tools/validate_slicer.py --slicer "/path/to/prusa-slicer-console.exe" --workdir "/path/outside/repo"
 ```
 
-Den laddar genererad komplett INI, skivar en lokalt genererad modell och kontrollerar
-start/slut, villkorlig homing, värmarbyten, accelerationskommandon och flödesgräns.
-Den kontrollerar också att bundle-sektionerna bär samma inställningar och identiteter.
-Rapporten sparas i arbetsmappen, inte som fler daterade dokument i repot.
-Fysiska prov, ljud, temperaturmarginaler och utskriftskvalitet redovisas i privat servicejournal.
+This loads the generated complete INI, slices a locally generated model and checks
+start/end commands, conditional homing, heater temperature changes, acceleration commands and flow limits.
+Bundle sections are also checked for matching settings and preset identities.
+Reports are saved in the work directory rather than as additional dated repository documents.
+Record physical tests, motor noise, temperature margins and print quality in private service records.

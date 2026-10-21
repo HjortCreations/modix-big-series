@@ -1,30 +1,30 @@
-# Komponenter och ändringar
+# Components and changes
 
-Ändra en sak på ett ställe. En recipe är en kombination, inte en ny kopia av all konfiguration.
+Change each setting in one place. A recipe selects components; it does not duplicate the entire configuration.
 
-| Ändring | Källa |
+| Change | Source |
 |---|---|
-| Gemensamt utskriftsavslut | firmware/common/stop.g |
-| Gemensam start/slutsekvens | slicer/gcode/ |
-| Storlek eller Z-skruvgeometri | config/models/ |
-| Slaglängd för ett visst exemplar | Lokal recipe utanför Git, via axis_max |
-| Huvudets fria rörelse/probning | config/toolheads/; lokal nozzle_insets_mm vid behov |
-| PID, BLTouch-offset, skevhet, shaper | Maskinens privata kalibrering; aldrig en huvudstandard |
-| Stegmotormodell och TMC-parametrar | config/motors/ + firmware/motors/; aktivt val krävs |
-| Hastighetsgräns / travelacceleration | config/motion/ |
-| Tidsuppskattning i slicern | Samma motion-komponents slicer_time_estimates; ändrar inte firmware |
-| Lager, väggar, infill, printacceleration | slicer/processes/ |
-| Retraktion och munstycke | slicer/toolheads/ |
-| Temperatur, flöde, fläkt, PA | slicer/materials/ |
+| Shared print-end behaviour | firmware/common/stop.g |
+| Shared start/end sequence | slicer/gcode/ |
+| Work envelope or Z-screw geometry | config/models/ |
+| Travel limits for an individual machine | A local recipe outside Git, using axis_max |
+| Toolhead movement/probing clearance | config/toolheads/; a local nozzle_insets_mm override if needed |
+| PID, BLTouch offsets, skew, input shaping | Private machine calibration; never a toolhead default |
+| Stepper model and TMC parameters | config/motors/ + firmware/motors/; requires an explicit choice |
+| Axis speed limits / travel acceleration | config/motion/ |
+| Slicer time estimates | The motion component's slicer_time_estimates; these do not configure firmware |
+| Layers, walls, infill, print acceleration | slicer/processes/ |
+| Retraction and nozzle size | slicer/toolheads/ |
+| Temperature, flow, fan and pressure advance | slicer/materials/ |
 
-Lokala overrides byggs med python tools/build.py --recipe FILE --output DIRECTORY.
-Filvägarna ska ligga utanför Git eller under ignorerade local/. Dessa data följer med det lokala paketets manifest, inte in i repo/release.
+Build local overrides with python tools/build.py --recipe FILE --output DIRECTORY.
+Store local files outside Git or under the ignored local/ directory. Their data appears in the local package manifest, not in the repository or published release packages.
 
-Exemplet BIG-120Z+ULTRA återanvänder samma process, material och munstyckskomponent som BIG-Meter+ULTRA.
-Gränserna hämtas från respektive vald motion-komponent. Exemplet måste driftsättas/provas separat.
+The BIG-120Z+ULTRA example reuses the same process, material and nozzle components as BIG-Meter+ULTRA.
+Motion limits come from the selected motion component. The example requires separate commissioning and testing.
 
-BIG-60/120X/180X-varianter läggs till först när underlag finns för geometri, motorordning, homing och frigång.
-Det finns inga påhittade fullkonfigurationer för dessa i repot.
+Add BIG-60/120X/180X variants only when geometry, motor order, homing and clearance have been established.
+This repository does not contain speculative full configurations for those machines.
 
-Äldre oförändrade original, servicehistorik och övergivna kalibreringstester stannar i det tidigare privata arkivet.
-Detta repo har en ny Git-historik utan dessa kunduppgifter. Det äldre repot raderas inte.
+Unmodified originals, service history and abandoned calibration tests remain in the previous private archive.
+This repository starts a new Git history without that customer data. The previous repository is preserved.

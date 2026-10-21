@@ -1,66 +1,66 @@
 # Modix BIG Series
 
-Gemensamma RepRapFirmware-makron och PrusaSlicer-profiler för Modix BIG-serien.
-**Griffin och Griffin ULTRA är oberoende av maskinstorleken.**
+Shared RepRapFirmware macros and PrusaSlicer profiles for the Modix BIG series.
+**Griffin and Griffin ULTRA toolheads are independent of machine size.**
 
-## Hämta och använd
+## Download and use
 
-Hämta ett färdigbyggt ZIP-paket från [Releases](https://github.com/HjortCreations/modix-big-series/releases).
-Läs [installation](docs/installation.md) innan systemfiler läggs på en skrivare.
-Paketet kompletterar en fungerande Modix-konfiguration; ingen ersättande `config.g` ingår.
+Download a prebuilt ZIP package from [Releases](https://github.com/HjortCreations/modix-big-series/releases).
+Read the [installation guide](docs/installation.md) before copying system files to a printer.
+Packages extend an existing, working Modix configuration; they do not replace `config.g`.
 
-| Paket | Geometri | Huvud / munstycke | Material / process |
+| Package | Work envelope, mm | Toolhead / nozzle | Material / process |
 |---|---|---|---|
-| `big-120z-griffin-0.6` | BIG-120Z V4, 600×600×1200 | Griffin 0,6 mm | PLA, 0,2 mm lager |
-| `big-meter-griffin-0.8` | BIG-Meter V4-referens, 980×1000×1000 | Griffin 0,8 mm | addnorth ePLA, 0,4 mm lager |
-| `big-meter-ultra-1.8` | BIG-Meter äldre uppgraderad variant, 965×980×1000 | ULTRA 1,8 mm | FormFutura ePLA, 1,0 mm lager |
+| `big-120z-griffin-0.6` | BIG-120Z V4, 600 × 600 × 1200 | Griffin 0.6 mm | PLA, 0.2 mm layers |
+| `big-meter-griffin-0.8` | BIG-Meter V4 reference, 980 × 1000 × 1000 | Griffin 0.8 mm | addnorth ePLA, 0.4 mm layers |
+| `big-meter-ultra-1.8` | BIG-Meter upgraded legacy variant, 965 × 980 × 1000 | ULTRA 1.8 mm | FormFutura ePLA, 1.0 mm layers |
 
-Måtten är etablerade arbetsvolymer, inte en garanti för alla exemplar av samma modell.
-Källorna är migrerade och kontrolleras offline. **De nya sammansatta paketen är ännu inte installerade eller fysiskt provade.**
-Fler BIG-storlekar läggs till när geometri och hårdvara finns verifierade. IDEX och annan Z-topologi ingår inte nu.
+These are established work envelopes, not guaranteed dimensions for every machine of the same model.
+The sources have been migrated and checked offline. **The newly assembled packages have not yet been installed or physically tested.**
+More BIG sizes can be added once their geometry and hardware have been verified. IDEX and other Z-drive arrangements are not currently supported.
 
-## Var finns inställningen?
+## Where settings belong
 
-| Del | Ansvar |
+| Component | Responsibility |
 |---|---|
-| `firmware/common/` | En U-rutin, ett stop.g, adaptiv mesh och axeltest |
-| `config/models/` | Arbetsvolym och Z-skruvgeometri |
-| `config/hardware/`, `firmware/hardware/` | Styrkort, ändstoppsriktning och befintlig homing |
-| `config/motion/`, `config/motors/` | Rörelsegränser, tidsuppskattning och valbara motorparametrar |
-| `config/toolheads/` | Huvudets frigång; ingen universell BLTouch-offset |
-| `slicer/toolheads/` | Munstycke, retraktion och lagergränser |
-| `slicer/processes/` | Lager, väggar, infill, hastigheter och printacceleration |
-| `slicer/materials/` | Temperatur, kylning, flöde och PA för material/huvud/munstycke |
-| `slicer/gcode/` | Vår gemensamma start-, slut- och lagerkod |
-| `recipes/` | Små kombinationsfiler som väljer komponenter |
+| `firmware/common/` | One U-tilt routine, one stop.g, adaptive mesh and axis test |
+| `config/models/` | Work envelope and Z-screw geometry |
+| `config/hardware/`, `firmware/hardware/` | Controller, endstop directions and existing homing routines |
+| `config/motion/`, `config/motors/` | Motion limits, time estimates and optional motor parameters |
+| `config/toolheads/` | Toolhead clearance; no universal BLTouch offset |
+| `slicer/toolheads/` | Nozzle size, retraction and layer-height limits |
+| `slicer/processes/` | Layers, walls, infill, speeds and print acceleration |
+| `slicer/materials/` | Temperature, cooling, flow and pressure advance for a material/toolhead/nozzle combination |
+| `slicer/gcode/` | Shared start, end and layer-change G-code |
+| `recipes/` | Small files that select a combination of components |
 
-ULTRA-processen och materialet återanvänds utan kopior på en annan modell.
-[Exemplet](examples/big-120z-ultra-1.8.json) visar sammansättningen och är inte en driftsatt maskinprofil.
+The same ULTRA process and material components can be reused on another model without copying them.
+The [example recipe](examples/big-120z-ultra-1.8.json) demonstrates this composition; it is not a commissioned machine profile.
 
-## Gemensamt beteende
+## Shared behaviour
 
-- Värm munstycket under homing. Full homing om Z är okänt, annars bara XY.
-- Villkorlig G32: återanvänd lyckad riktning medan Z hålls och huvudet är oförändrat. `G32 S1` tvingar ny riktning.
-- Proba adaptiv mesh för varje utskrift. U-vägen växlar riktning mellan passen.
-- Behåll Modix avslut via M0 → stop.g: varm retraktion, kylning, sänk till minst Z300 med högst Z-max, parkera X1 Y1 och behåll Z-hållström.
-- Startkoden styr acceleration, axelgränser och PA. Slicerns accelerationsöverstyrningar är noll.
-- Byggplattevärmarna används inte. Samma tydliga filnamnsformat används överallt.
+- Heat the nozzle during homing. Home all axes if Z is unknown; otherwise home XY only.
+- Run conditional G32: reuse successful bed alignment while Z remains held and the toolhead is unchanged. `G32 S1` forces realignment.
+- Probe an adaptive mesh for each print. The U-shaped tilt path reverses between passes.
+- Retain the Modix end sequence through M0 → stop.g: retract while hot, turn off tool heating, lower the bed towards at least Z300 without exceeding Z-max, park at X1 Y1 and retain Z holding current.
+- Set acceleration, axis speed limits and pressure advance in start G-code. Slicer acceleration overrides remain zero.
+- Leave bed heating disabled and use the same descriptive output filename format throughout.
 
-ULTRA 1,8 mm: **100 mm³/s, 235/215 °C, PA 0,035, print250/travel800**,
-1,0/1,2 mm lager och retraktion 1,2 mm vid 35 mm/s. Detta är operatörens fungerande inställningar, inte uppmätt maxkapacitet.
-G-code resolution behåller **0,0125 mm** i den migrerade baslinjen; förslaget 0,05 mm har inte införts automatiskt.
+ULTRA 1.8 mm working settings: **100 mm³/s, 235/215 °C, PA 0.035, print/travel acceleration 250/800 mm/s²**,
+1.0 mm layers, a 1.2 mm first layer and 1.2 mm retraction at 35 mm/s. These are operator-reported working settings, not a measured maximum throughput.
+G-code resolution remains **0.0125 mm** in the migrated baseline; the proposed 0.05 mm setting has not been applied automatically.
 
-## Bygg och kontrollera
+## Build and check
 
-Kräver Python 3.10+; inga Python-paket behövs.
+Requires Python 3.10+ with no additional Python packages.
 
 ```console
 python tools/check.py
 python tools/build.py --all
 ```
 
-Utdata hamnar i ignorerade dist/. ZIP-paketen innehåller ett manifest, systemfiler och två slicerformat:
-PrusaSlicer.ini för **Import Config** samt PrusaSlicer-bundle.ini för **Import Config Bundle**.
-Bundle-formatet delar namn på process/material mellan maskinstorlekarna.
+Output goes into the ignored dist/ directory. Each ZIP contains a manifest, system files and two slicer formats:
+PrusaSlicer.ini for **Import Config**, and PrusaSlicer-bundle.ini for **Import Config Bundle**.
+The bundle uses the same process and material preset names across machine sizes.
 
-[Underhållsregler](AGENTS.md) · [Komponenter och ändringar](docs/maintenance.md) · [Provningsstatus](docs/validation.md)
+[Maintenance rules](AGENTS.md) · [Components and changes](docs/maintenance.md) · [Validation status](docs/validation.md)

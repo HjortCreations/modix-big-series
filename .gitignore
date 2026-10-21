@@ -1,0 +1,13 @@
+/dist/
+/local/
+/private/
+/validation-local/
+__pycache__/
+*.pyc
+**/config_probe*.g
+**/PID*.g
+**/heightmap*.csv
+**/resurrect.g
+**/wifi*.g
+*.key
+*.pem

@@ -1,0 +1,20 @@
+{
+  "max_feedrate_command": "M203 X12000 Y12000",
+  "travel_acceleration": 800,
+  "slicer_time_estimates": {
+    "machine_max_acceleration_e": "2000,2000",
+    "machine_max_acceleration_extruding": "250,250",
+    "machine_max_acceleration_travel": "800,800",
+    "machine_max_acceleration_x": "1000,1000",
+    "machine_max_acceleration_y": "1000,1000",
+    "machine_max_acceleration_z": "100,100",
+    "machine_max_feedrate_e": "120,120",
+    "machine_max_feedrate_x": "200,200",
+    "machine_max_feedrate_y": "200,200",
+    "machine_max_feedrate_z": "12,12",
+    "machine_max_jerk_e": "2.5,2.5",
+    "machine_max_jerk_x": "5,5",
+    "machine_max_jerk_y": "5,5",
+    "machine_max_jerk_z": "0.2,0.4"
+  }
+}

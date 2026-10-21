@@ -1,0 +1,12 @@
+{
+  "name": "Griffin",
+  "required_primary_tool_heaters": 1,
+  "nozzle_insets_mm": [
+    2,
+    2,
+    2,
+    2
+  ],
+  "home_front_mm": 5,
+  "status": "Reference clearances; verify against the installed probe and bed."
+}

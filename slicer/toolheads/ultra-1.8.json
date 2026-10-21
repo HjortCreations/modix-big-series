@@ -1,0 +1,17 @@
+{
+  "name": "ultra-1.8",
+  "head": "griffin-ultra",
+  "settings": {
+    "max_layer_height": "1.4",
+    "min_layer_height": "0.4",
+    "nozzle_diameter": "1.8",
+    "retract_before_travel": "6",
+    "retract_length": "1.2",
+    "retract_lift": "1",
+    "retract_speed": "35",
+    "silent_mode": "0",
+    "travel_ramping_lift": "0",
+    "use_relative_e_distances": "1",
+    "variable_layer_height": "1"
+  }
+}

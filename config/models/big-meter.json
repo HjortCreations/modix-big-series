@@ -1,0 +1,37 @@
+{
+  "name": "BIG-Meter",
+  "axis_min": [
+    0,
+    0,
+    -2
+  ],
+  "variants": {
+    "v4-reference": {
+      "axis_max": [
+        980,
+        1000,
+        1000
+      ]
+    },
+    "legacy-upgraded": {
+      "axis_max": [
+        965,
+        980,
+        1000
+      ]
+    }
+  },
+  "screw_x": [
+    -185,
+    -185,
+    1068,
+    1068
+  ],
+  "screw_y": [
+    1068,
+    -46,
+    -46,
+    1068
+  ],
+  "status": "Two established work-envelope references. Confirm actual travel; model name alone does not define usable reach."
+}

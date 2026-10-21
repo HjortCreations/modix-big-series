@@ -1,0 +1,12 @@
+{
+  "name": "Griffin ULTRA",
+  "required_primary_tool_heaters": 2,
+  "nozzle_insets_mm": [
+    2,
+    40,
+    2,
+    2
+  ],
+  "home_front_mm": 40,
+  "status": "40mm front clearance retained from the commissioned ULTRA baseline; verify on every installation, not a universal probe offset."
+}

@@ -1,0 +1,68 @@
+if exists(param.D)
+    if param.D = 1
+        echo "Homing plan only: homeall.g"
+        M99
+; Full/Z homing invalidates conditional tilt.
+if exists(global.bigUTiltValid)
+    set global.bigUTiltValid = false
+; homeall.g
+; called to home all axes
+M98 P"config_probe.g"							; Load Primary Z-offset probe settings
+if global.idex = 1
+	M98 P"config_probe_secondary.g"						; Load secondary Z-offset settings
+	M98 P"config_probe_offset_U.g"						; Load secondary U offset settings
+	M98 P"config_probe_offset_X.g"						; Load secondary X offset settings
+	if state.currentTool = 0
+		set global.toolstate = 0
+	elif state.currentTool = 1
+		set global.toolstate = 1
+
+M280 P0 S60 I1											; clear any probe errors
+G29 S2													; cancel mesh bed compensation
+T-1 P0													; Deselect all tools
+G91                    									; relative positioning
+M913 X50 												; X axis 50% power
+G1 H2 Z5 F200          									; lift Z relative to current position
+
+if global.idex = 0
+	G1 H2 X0.5 Y0.5 									; back off 0.5mm from X, Y and U
+	G1 H1 X{(move.axes[0].max+5)*-1} Y{(move.axes[1].max+5)*-1} F5000	; move quickly to X, Y and Y axis endstops and stop there (first pass)
+	G1 H2 X2 Y2 F600      								; go back a few mm
+	G1 H1 X{(move.axes[0].max+5)*-1} Y{(move.axes[1].max+5)*-1} F600		; move slowly to X, Y and Y axis endstops once more (second pass)
+elif global.idex = 1
+	G1 H2 X0.5 Y0.5 U-0.5											; back off 0.5mm from X, Y and U
+	G1 H1 X{(move.axes[0].max+5)*-1} Y{(move.axes[1].max+5)*-1} U{(move.axes[3].max+5)} F5000		; move quickly to X, Y and Y axis endstops and stop there (first pass)
+	G1 H2 X2 Y2 U-2 F600      										; go back a few mm
+	G1 H1 X{(move.axes[0].max+5)*-1} Y{(move.axes[1].max+5)*-1} U{(move.axes[3].max+5)} F600		; move slowly to X, Y and Y axis endstops once more (second pass)
+
+M913 X100 												; X axis 100% power
+G90														; absolute positioning
+@HOME_BEFORE_Z@
+M203 Z600                                                ; allow fast Z homing approach, mm/min
+
+G1 F600                                                  ; homing move feedrate, mm/min
+
+G30                                                        ; home Z by probing the bed
+M203 Z400                                                ; restore normal Z speed limit for printing, mm/min
+
+G29 S1                                                    ; load heightmap
+
+if job.file.fileName = null
+	G4 S0
+elif global.idex = 1
+	if global.toolstate = 0
+		G90
+		T0
+		G4 P0
+		G1 Y200 X10 Z5
+		G4 S0
+		T0
+	elif global.toolstate = 1
+		G90
+		T0
+		G4 P0
+		G1 Y200 X10 Z5
+		G4 S0
+		T1
+
+set global.pausetime = 0

@@ -1,0 +1,21 @@
+if exists(param.D)
+    if param.D = 1
+        echo "Homing plan only: homey.g"
+        M99
+; homey.g
+; called to home the Y axis
+G91              						; relative positioning
+T-1 P0									; Deselect all tools
+
+if global.idex = 1
+	M98 P"config_probe_offset_U.g"		; Load secondary U offset settings
+
+G1 H2 Z5 F200   						; lift Z relative to current position
+G1 H2 Y0.5 F600      					; go back 1mm
+G1 H1 Y{(move.axes[1].max+5)*-1} F5000	; move quickly to Y axis endstop and stop there (first pass)
+G1 H2 Y2 F600   						; go back a 2 mm
+G1 H1 Y{(move.axes[01].max+5)*-1} F600	; move slowly to Y axis endstop once more (second pass)
+
+G1 H2 Z-5 F3000  						; lower Z again
+G90              						; absolute positioning
+set global.pausetime = 0

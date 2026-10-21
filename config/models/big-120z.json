@@ -1,0 +1,30 @@
+{
+  "name": "BIG-120Z",
+  "axis_min": [
+    0,
+    0,
+    -2
+  ],
+  "variants": {
+    "v4": {
+      "axis_max": [
+        600,
+        600,
+        1200
+      ]
+    }
+  },
+  "screw_x": [
+    -185,
+    -185,
+    668,
+    668
+  ],
+  "screw_y": [
+    668,
+    -46,
+    -46,
+    668
+  ],
+  "status": "V4 geometry reference; installation-specific travel remains a local override."
+}

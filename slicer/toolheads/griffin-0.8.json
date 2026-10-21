@@ -1,0 +1,28 @@
+{
+  "name": "griffin-0.8",
+  "head": "griffin",
+  "settings": {
+    "bed_custom_model": "",
+    "bed_custom_texture": "",
+    "between_objects_gcode": "",
+    "default_filament_profile": "",
+    "default_print_profile": "",
+    "layer_gcode": "",
+    "max_layer_height": "0.6",
+    "min_layer_height": "0.1",
+    "nozzle_diameter": "0.8",
+    "printer_model": "",
+    "printer_variant": "",
+    "printer_vendor": "",
+    "retract_before_travel": "2",
+    "retract_length": "0.8",
+    "retract_lift": "0.5",
+    "retract_speed": "40",
+    "silent_mode": "1",
+    "template_custom_gcode": "",
+    "toolchange_gcode": "",
+    "travel_ramping_lift": "0",
+    "use_relative_e_distances": "0",
+    "variable_layer_height": "0"
+  }
+}

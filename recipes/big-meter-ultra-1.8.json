@@ -1,0 +1,10 @@
+{
+  "model": "big-meter",
+  "geometry_variant": "legacy-upgraded",
+  "hardware": "duet2-duex5-xmin-ymax",
+  "toolhead": "ultra-1.8",
+  "process": "ultra-1.8-layer-1.0",
+  "material": "formfutura-epla-ultra-1.8",
+  "motion": "nema23-250",
+  "status": "Baseline migrated and offline checked; clean generated package has not been installed on a printer."
+}

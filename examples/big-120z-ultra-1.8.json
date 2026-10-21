@@ -1,0 +1,10 @@
+{
+  "model": "big-120z",
+  "geometry_variant": "v4",
+  "hardware": "duet2-duex5-xmin-ymin",
+  "toolhead": "ultra-1.8",
+  "process": "ultra-1.8-layer-1.0",
+  "material": "formfutura-epla-ultra-1.8",
+  "motion": "griffin-200-print250",
+  "status": "Composition example only; no physical installation verified."
+}

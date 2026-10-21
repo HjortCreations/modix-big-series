@@ -1,0 +1,41 @@
+{
+  "motor_label": "MOTECH MT-2305HS280A29-S",
+  "step_angle_deg": 1.8,
+  "identification": "Motor label photographed; two matching X motors confirmed.",
+  "suffix_note": "Operator recalls A29-S specifies the connector. No manufacturer code key was found to independently verify that interpretation.",
+  "electrical_reference": {
+    "model": "MT-2305HS280AW",
+    "relationship_to_labelled_variant": "Same base model; winding equivalence to A29-S is an assumption pending manufacturer confirmation",
+    "rated_current_A_per_phase": 2.8,
+    "resistance_ohm_per_phase": 1.13,
+    "resistance_tolerance_percent": 10,
+    "inductance_H_per_phase": 0.0036,
+    "inductance_tolerance_percent": 20,
+    "source": "https://www.motechmotor.com/productDetail-0105-81.html"
+  },
+  "driver": "TMC2660 on Duet 2 WiFi",
+  "calculation_assumptions": {
+    "supply_V": 24.3,
+    "driver_clock_Hz": 15000000,
+    "clock_note": "Datasheet nominal internal clock, not measured on this board",
+    "sense_resistor_ohm": 0.051,
+    "vsense_V": 0.165,
+    "rrf_configured_peak_current_mA": 1800,
+    "toff": 4,
+    "tbl_candidate": 1,
+    "hstrt_raw": 3,
+    "hend_raw": 3,
+    "hdec_raw": 0
+  },
+  "candidate_status": "Conservative provisional trial; not a verified optimum or exact-variant electrical calibration",
+  "change_from_observed_baseline": "TBL 2 to 1 only: nominal blank time 2.4 us to 1.6 us; retain spreadCycle, TOFF4, HSTRT/HEND/HDEC3/3/0, current and microstepping",
+  "candidate_M569_parameters": "D2 F4 B1 Y3:3:0",
+  "rollback_M569_parameters": "D2 F4 B2 Y3:3:0",
+  "references": {
+    "driver_datasheet": "https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2660_datasheet_Rev1.07.pdf",
+    "driver_datasheet_sections": "6.6 register encodings; 9.1 spreadCycle estimation; 13 internal clock",
+    "rrf_current_quantisation": "https://github.com/Duet3D/RepRapFirmware/blob/3.5.4/src/Movement/StepperDrivers/TMC2660.cpp",
+    "rrf_parameters": "https://docs.duet3d.com/User_manual/Reference/Gcodes/M569"
+  },
+  "status": "Provisional TMC2660 blanking-time trial; operator later reported smoother motion. Mechanical fastener adjustment also changed the result; no proven optimum."
+}

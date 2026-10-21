@@ -1,0 +1,7 @@
+{
+  "controller": "Duet2WiFi + DueX5",
+  "homing": "xmin-ymax",
+  "z_motors": 4,
+  "idex": false,
+  "status": "Existing legacy-upgraded single-head homing retained, including one XY pass. Physical trial of that recent one-pass revision remains pending."
+}

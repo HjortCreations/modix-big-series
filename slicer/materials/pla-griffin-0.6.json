@@ -1,0 +1,29 @@
+{
+  "name": "PLA - Griffin0.6",
+  "pressure_advance": 0.015,
+  "settings": {
+    "chamber_minimal_temperature": "0",
+    "chamber_temperature": "0",
+    "cooling_perimeter_transition_distance": "0",
+    "cooling_slowdown_logic": "uniform_cooling",
+    "custom_parameters_filament": "\"\"",
+    "disable_fan_first_layers": "1",
+    "extrusion_multiplier": "0.98",
+    "filament_abrasive": "0",
+    "filament_cost": "24.99",
+    "filament_flush_speed": "0",
+    "filament_flush_volume": "0",
+    "filament_infill_max_crossing_speed": "0",
+    "filament_infill_max_speed": "0",
+    "filament_max_volumetric_speed": "0",
+    "filament_seam_gap_distance": "nil",
+    "filament_shrinkage_compensation_xy": "0%",
+    "filament_shrinkage_compensation_z": "0%",
+    "filament_vendor": "addnorth",
+    "first_layer_temperature": "230",
+    "full_fan_speed_layer": "3",
+    "min_print_speed": "10",
+    "slowdown_below_layer_time": "15",
+    "temperature": "220"
+  }
+}

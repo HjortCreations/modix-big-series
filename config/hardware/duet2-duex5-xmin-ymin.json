@@ -1,0 +1,7 @@
+{
+  "controller": "Duet2WiFi + DueX5",
+  "homing": "xmin-ymin",
+  "z_motors": 4,
+  "idex": false,
+  "status": "Existing V4 single-head homing retained, including two XY passes. No rewiring is installed."
+}

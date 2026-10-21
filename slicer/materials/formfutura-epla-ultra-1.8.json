@@ -1,0 +1,17 @@
+{
+  "name": "FormFutura ePLA - ULTRA1.8 - 100mm3-s",
+  "pressure_advance": 0.035,
+  "settings": {
+    "disable_fan_first_layers": "2",
+    "extrusion_multiplier": "1",
+    "filament_cost": "0",
+    "filament_max_volumetric_speed": "100",
+    "filament_seam_gap_distance": "15%",
+    "filament_vendor": "FormFutura",
+    "first_layer_temperature": "235",
+    "full_fan_speed_layer": "5",
+    "min_print_speed": "5",
+    "slowdown_below_layer_time": "45",
+    "temperature": "215"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "model": "big-meter",
+  "geometry_variant": "v4-reference",
+  "hardware": "duet2-duex5-xmin-ymin",
+  "toolhead": "griffin-0.8",
+  "process": "griffin-0.8-layer-0.4",
+  "material": "addnorth-epla-griffin-0.8",
+  "motion": "griffin-200-print250",
+  "status": "Baseline migrated and offline checked; clean generated package has not been installed on a printer."
+}

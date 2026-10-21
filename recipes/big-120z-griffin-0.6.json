@@ -1,0 +1,10 @@
+{
+  "model": "big-120z",
+  "geometry_variant": "v4",
+  "hardware": "duet2-duex5-xmin-ymin",
+  "toolhead": "griffin-0.6",
+  "process": "griffin-0.6-layer-0.2",
+  "material": "pla-griffin-0.6",
+  "motion": "griffin-200-print500",
+  "status": "Baseline migrated and offline checked; clean generated package has not been installed on a printer."
+}

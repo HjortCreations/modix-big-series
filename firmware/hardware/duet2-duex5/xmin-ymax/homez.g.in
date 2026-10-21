@@ -1,0 +1,31 @@
+if exists(param.D)
+    if param.D = 1
+        echo "PLAN homez.g: Z approach 600:180 mm/min; normal Z limit restored to 400"
+        M99
+; Full/Z homing invalidates the shared conditional G32 cache.
+if exists(global.bigUTiltValid)
+    set global.bigUTiltValid = false
+; homez.g
+; called to home the Z axis
+
+M98 P"config_probe.g"									; Load BLTouch probe settings
+if global.idex = 1
+	M98 P"config_probe_secondary.g"						; Load secondary Z-offset settings
+
+M280 P0 S60 I1											; clear any probe errors
+G29 S2													; cancel mesh bed compensation
+T-1 P0													; Deselect all tools
+
+G91                 									; relative positioning
+G1 H2 Z5 F200      										; lift Z relative to current position
+G90                    									; absolute positioning
+
+G1 X{move.axes[0].min+5} Y{move.axes[1].min+@HOME_FRONT@} F5000 	; move to front left
+
+G1 F600													; slow speed
+M558 F600:180 ; Fast first homing probe, then slow accurate probing
+M203 Z600 ; Temporary Z homing limit: 10 mm/s
+G1 F600 ; Feedrate for the homing approach, mm/min
+G30                    									; home Z by probing the bed
+M203 Z400 ; Restore normal Z limit: 6.67 mm/s
+G29 S1													; load heightmap

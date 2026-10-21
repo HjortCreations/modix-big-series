@@ -1,0 +1,16 @@
+{
+  "name": "addnorth ePLA - Griffin0.8",
+  "pressure_advance": 0.015,
+  "settings": {
+    "disable_fan_first_layers": "1",
+    "extrusion_multiplier": "0.98",
+    "filament_cost": "24.99",
+    "filament_max_volumetric_speed": "30",
+    "filament_vendor": "addnorth",
+    "first_layer_temperature": "235",
+    "full_fan_speed_layer": "3",
+    "min_print_speed": "10",
+    "slowdown_below_layer_time": "15",
+    "temperature": "225"
+  }
+}

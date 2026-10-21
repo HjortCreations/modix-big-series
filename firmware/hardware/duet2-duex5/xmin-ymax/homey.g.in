@@ -1,0 +1,14 @@
+if exists(param.D)
+    if param.D = 1
+        echo "PLAN homey.g: Single axis pass 5000 mm/min; 2 mm switch clearance; no second probe"
+        M99
+; homey.g
+; called to home the Y axis
+G91										; relative positioning
+
+G1 H2 Z5 F200							; lift Z relative to current position
+G1 H1 Y{(move.axes[1].max+5)} F5000		; home Y once against its maximum endstop
+G1 H2 Y-2 F600							; go back a few mm
+
+G1 H2 Z-5 F3000							; lower Z again
+G90										; absolute positioning

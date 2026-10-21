@@ -16,7 +16,7 @@ These ZIPs do not contain firmware, homing files, model geometry or a replacemen
 
 ## Use with an existing printer preset
 
-1. Import PrusaSlicer-process-material.ini with **File â†’ Import â†’ Import Config Bundle**.
+1. Import PrusaSlicer-process-material.ini with **File → Import → Import Config Bundle**.
    This imports Print Settings and Filament Settings only. Select them alongside your existing printer preset.
 2. Check that the existing printer preset matches the chosen nozzle and head settings.
    toolhead-settings-reference.json lists the shared nozzle, retraction and extrusion-mode settings without any machine geometry.
@@ -42,7 +42,7 @@ python tools/build.py --profiles
 - common/startup.json: common default travel acceleration.
 - gcode/: the shared start/end/layer-change sequence.
 
-The current ULTRA 1.8 mm/ePLA baseline uses 100 mmÂ³/s, 235/215 Â°C, PA 0.035 and print/travel acceleration 250/800 mm/sÂ².
+The current ULTRA 1.8 mm/ePLA baseline uses 100 mm³/s, 235/215 °C, PA 0.035 and print/travel acceleration 250/800 mm/s².
 Those are shared working defaults for that setup across sizes, not a measured maximum for every material or nozzle.
 
 Prepared combinations that also contain a particular printer's geometry remain available as **example-** packages.

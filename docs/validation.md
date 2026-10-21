@@ -7,7 +7,7 @@ The tools in this repository do not operate a printer.
 
 - Shared start/end G-code retains the existing command sequence; numeric values come from the selected components.
 - The U-tilt core and stop.g reuse the latest shared sources. Retraction conditions, Z-max handling and X1 Y1 parking are preserved.
-- For ULTRA 1.8 mm, the operator reports working settings of 100 mmÂ³/s, 235/215 Â°C and PA 0.035. These are not measured maximum-throughput results.
+- For ULTRA 1.8 mm, the operator reports working settings of 100 mm³/s, 235/215 °C and PA 0.035. These are not measured maximum-throughput results.
 - Conditional U-tilt was previously tested physically on one four-Z-motor installation. This does not establish commissioning of every new combination.
 - The new packages have been built and checked offline. No system files were uploaded and no firmware was restarted during migration.
 - The recently introduced X-min/Y-max single-pass homing and latest X1 Y1 end sequence still require physical observation on each installation.

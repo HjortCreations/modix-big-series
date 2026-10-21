@@ -5,6 +5,7 @@
 - Compatibility statements must describe actual firmware, axes, probe and hardware requirements. Keep physical test coverage separate from compatibility; do not claim all printer types are supported.
 - Shared macros must be usable without a model/nozzle recipe. Print/material profiles must build without model, hardware or motion components. Keep machine geometry in the separate printer configuration.
 - Write repository documentation, code comments, user-facing messages and release notes in English.
+- Save text as UTF-8. Preserve arrows, punctuation and unit symbols without Windows-1252 conversion; tools/check.py rejects common encoding corruption.
 - This repository contains reusable components. Keep customer names, addresses, IP/MAC addresses, controller UIDs, CRM IDs, passwords, network settings and service notes in private local service records outside the repository.
 - Update the appropriate component instead of adding a complete machine copy. Keep model geometry out of toolhead, material and process profiles. Material and process profiles must not depend on model names.
 - macros/stop.g, macros/g32_u.g and slicer/gcode/ are the sole sources for their respective shared routines. Never edit generated copies manually.

@@ -3,7 +3,7 @@
 Reusable printer macros and independent slicer profiles for the Modix BIG series.
 Choose the feature you need. A machine example's name does not limit a shared feature to that model or nozzle.
 
-## Printer macros â€” use independently
+## Printer macros — use independently
 
 | Feature | Open the file | Purpose |
 |---|---|---|
@@ -15,11 +15,11 @@ Choose the feature you need. A machine example's name does not limit a shared fe
 **The same stop.g and adaptive_mesh.g files are used across machine sizes and nozzle diameters.**
 They read the machine's configured values at runtime. No BIG-60, BIG-120Z, BIG-Meter or BIG-180X recipe is needed to download or use them.
 
-[Macro instructions and compatibility requirements](macros/README.md) Â· [Download individual files or shared-macros.zip](https://github.com/HjortCreations/modix-big-series/releases)
+[Macro instructions and compatibility requirements](macros/README.md) · [Download individual files or shared-macros.zip](https://github.com/HjortCreations/modix-big-series/releases)
 
 Compatibility depends on the actual firmware, axes, probe and tool mapping. Adaptive mesh needs compatible Cartesian RepRapFirmware and a commissioned probe; U-tilt additionally needs four independently driven Z motors. Physical test coverage is documented separately.
 
-## Slicer profiles â€” choose by head, nozzle and material
+## Slicer profiles — choose by head, nozzle and material
 
 | Independent profile | Process | Material |
 |---|---|---|
@@ -31,10 +31,10 @@ Compatibility depends on the actual firmware, axes, probe and tool mapping. Adap
 The printer preset supplies machine geometry and hardware limits separately.
 The profile packages contain print/material presets, shared start/end snippets and head settings without firmware or model geometry.
 
-[Slicer instructions](slicer/README.md) Â· [Download profile- ZIP packages](https://github.com/HjortCreations/modix-big-series/releases)
+[Slicer instructions](slicer/README.md) · [Download profile- ZIP packages](https://github.com/HjortCreations/modix-big-series/releases)
 
-The current ULTRA 1.8 mm/ePLA defaults are 100 mmÂ³/s, 235/215 Â°C, PA 0.035,
-print/travel acceleration 250/800 mm/sÂ², 1.0 mm layers and a 1.2 mm first layer.
+The current ULTRA 1.8 mm/ePLA defaults are 100 mm³/s, 235/215 °C, PA 0.035,
+print/travel acceleration 250/800 mm/s², 1.0 mm layers and a 1.2 mm first layer.
 These are working defaults for that head/nozzle/material, independent of bed size, not a measured maximum throughput.
 G-code resolution remains 0.0125 mm; the proposed 0.05 mm change has not been applied automatically.
 
@@ -63,4 +63,4 @@ python tools/build.py --all
 - config/: separate model, hardware, head-clearance and motor/motion references.
 - recipes/: optional example combinations of those components.
 
-[Maintenance rules](AGENTS.md) Â· [Where to make changes](docs/maintenance.md) Â· [Validation status](docs/validation.md)
+[Maintenance rules](AGENTS.md) · [Where to make changes](docs/maintenance.md) · [Validation status](docs/validation.md)

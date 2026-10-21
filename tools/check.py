@@ -147,6 +147,9 @@ def privacy():
         if rel.as_posix() not in tracked and any(p in {'dist','__pycache__','local','private','validation-local'} for p in rel.parts):continue
         if len(rel.parts)>1:assert rel.parts[0] in allowed,rel
         value=path.read_text(encoding='utf-8-sig')
+        # Catch UTF-8 text accidentally decoded as Windows-1252 before saving.
+        for broken in ['\ufffd', '\u00c2', '\u00c3', '\u00e2\u20ac', '\u00e2\u2020']:
+            assert broken not in value, ('Broken text encoding', rel, ascii(broken))
         for pattern in patterns:assert not re.search(pattern,value),('Sensitive data pattern',rel)
         if rel.parts[0] in {'macros','slicer','config','recipes','examples','firmware'}:
             assert not re.search(r'(?m)^\s*(?:G31\b|M556\b|M307\b|M593\b)',value),('Local calibration',rel)

@@ -27,6 +27,58 @@ def template(path, substitutions=None):
         raise ValueError('Unresolved template: ' + path)
     return value
 
+def start_code(process, material, head, max_feedrate=None, insets=None):
+    left,front,right,rear = insets or head['nozzle_insets_mm']
+    substitutions = dict(PRINT_ACCEL=process['print_acceleration'],
+                         TRAVEL_ACCEL=read('slicer/common/startup.json')['travel_acceleration'],
+                         MAX_FEEDRATE=max_feedrate or '', PA=material['pressure_advance'],
+                         LEFT=left, FRONT=front, RIGHT=right, REAR=rear)
+    value = template('slicer/gcode/start.gcode', substitutions)
+    if max_feedrate is None:
+        value = value.replace(' ; Axis limits, mm/min', '; Keep the existing machine axis speed limits')
+    return value
+
+def bed_wrapper(head, insets):
+    left,front,right,rear = insets
+    call = f'M98 P"g32_u.g" H"{head["name"]}" A{left} B{front} C{right} E{rear} S{{var.force}}'
+    return ('; Toolhead clearance wrapper; independent of machine size and nozzle.\n'
+            'var force = 0\nif exists(param.S)\n    set var.force = param.S\n'
+            'if exists(param.D)\n    '+call+' D{param.D}\nelse\n    '+call+'\n').encode()
+
+def profile_files(selection):
+    """Print/material presets and head setup, without reading any machine model."""
+    tool = component('slicer/toolheads', selection['toolhead'])
+    head = component('config/toolheads', tool['head'])
+    process = component('slicer/processes', selection['process'])
+    material = component('slicer/materials', selection['material'])
+    groups = {g:read(f'slicer/common/{g}.json') for g in ['print','filament']}
+    groups['print'].update(process['settings'])
+    groups['filament'].update(material['settings'])
+    groups['print']['print_settings_id'] = 'BIG '+process['name']
+    groups['filament']['filament_settings_id'] = '"BIG '+material['name']+'"'
+    groups['print']['notes'] = 'Reusable BIG process; shared start G-code controls motion and pressure advance.'
+    groups['filament']['filament_notes'] = '"Working material/nozzle settings; maximum throughput is not independently measured."'
+    bundle = '# Machine-independent print and filament presets; Import Config Bundle.\n'
+    for group,settings in groups.items():
+        name = 'BIG '+(process if group=='print' else material)['name']
+        bundle += '\n['+group+':'+name+']\n'+''.join(f'{k} = {v}\n' for k,v in sorted(settings.items()))
+    return {'PrusaSlicer-process-material.ini':bundle.encode(),
+            'gcode/start.gcode':start_code(process,material,head).encode(),
+            'gcode/end.gcode':text('slicer/gcode/end.gcode').encode(),
+            'gcode/before-layer.gcode':text('slicer/gcode/before-layer.gcode').encode(),
+            'toolhead-settings-reference.json':(json.dumps({**{k:v for k,v in read('slicer/common/printer.json').items()
+              if k in ['gcode_flavor','autoemit_temperature_commands','use_firmware_retraction','use_volumetric_e',
+                       'retract_layer_change','retract_before_wipe','wipe']}, **tool['settings']},indent=2)+'\n').encode(),
+            'README.md':text('slicer/README.md').encode()}
+
+def macro_files():
+    files = {name:text('macros/'+name).encode() for name in ['stop.g','adaptive_mesh.g','g32_u.g','axis_test.g']}
+    for ident in ['griffin','griffin-ultra']:
+        head = component('config/toolheads',ident)
+        files['bed-'+ident+'.g'] = bed_wrapper(head,head['nozzle_insets_mm'])
+    files['README.md'] = text('macros/README.md').encode()
+    return files
+
 def compose(recipe):
     model = component('config/models', recipe['model'])
     variant = model['variants'][recipe['geometry_variant']]
@@ -53,9 +105,8 @@ def compose(recipe):
     printer.update(motion['slicer_time_estimates'])
     printer['bed_shape'] = f'{minima[0]}x{minima[1]},{bounds[0]}x{minima[1]},{bounds[0]}x{bounds[1]},{minima[0]}x{bounds[1]}'
     printer['max_print_height'] = str(bounds[2])
-    substitutions = dict(PRINT_ACCEL=process['print_acceleration'], TRAVEL_ACCEL=motion['travel_acceleration'],
-                         MAX_FEEDRATE=motion['max_feedrate_command'], PA=material['pressure_advance'])
-    printer['start_gcode'] = template('slicer/gcode/start.gcode', substitutions).rstrip().replace('\n', r'\n')
+    printer['start_gcode'] = start_code(process, material, head, motion['max_feedrate_command'],
+                                       [left,front,right,rear]).rstrip().replace('\n', r'\n')
     printer['end_gcode'] = text('slicer/gcode/end.gcode').rstrip().replace('\n', r'\n')
     printer['before_layer_gcode'] = text('slicer/gcode/before-layer.gcode').rstrip().replace('\n', r'\n')
     printer.update(host_type='duet', print_host='', printhost_apikey='')
@@ -71,16 +122,9 @@ def compose(recipe):
         if key.endswith('_acceleration'):
             groups['print'][key] = '0'
     flat = {k: v for group in groups.values() for k, v in group.items()}
-    wrapper = ('; Selected head clearance; probe calibration remains local.\n'
-               'var force = 0\nif exists(param.S)\n    set var.force = param.S\n'
-               'if exists(param.D)\n'
-               f'    M98 P"g32_u.g" H"{head["name"]}" A{left} B{front} C{right} E{rear} S{{var.force}} D{{param.D}}\n'
-               'else\n'
-               f'    M98 P"g32_u.g" H"{head["name"]}" A{left} B{front} C{right} E{rear} S{{var.force}}\n')
-    files = {'sys/' + name: text('firmware/common/' + name).encode() for name in ['stop.g', 'g32_u.g', 'axis_test.g']}
-    files['sys/bed.g'] = wrapper.encode()
-    files['sys/adaptive_mesh.g'] = template('firmware/common/adaptive_mesh.g.in',
-                                           dict(LEFT=left, FRONT=front, RIGHT=right, REAR=rear)).encode()
+    files = {'sys/' + name: text('macros/' + name).encode() for name in ['stop.g', 'g32_u.g', 'axis_test.g']}
+    files['sys/bed.g'] = bed_wrapper(head,[left,front,right,rear])
+    files['sys/adaptive_mesh.g'] = text('macros/adaptive_mesh.g').encode()
     for name in ['homeall.g', 'homez.g', 'homex.g', 'homey.g']:
         home_front = recipe.get('home_front_mm', head['home_front_mm'])
         before_z = ''
@@ -119,24 +163,40 @@ def build(recipe_path, destination):
         path.write_bytes(value)
     return files
 
+def archive(name, files):
+    destination = ROOT/'dist'/name
+    for path,value in files.items():
+        target = destination/path
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_bytes(value)
+    with zipfile.ZipFile(ROOT/'dist'/(name+'.zip'),'w',zipfile.ZIP_DEFLATED) as output:
+        for path,value in sorted(files.items()):
+            info=zipfile.ZipInfo(path,(2026,10,21,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+            output.writestr(info,value)
+    print('Built '+name)
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--recipe', type=Path)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--all', action='store_true')
+    parser.add_argument('--macros', action='store_true')
+    parser.add_argument('--profiles', action='store_true')
     args = parser.parse_args()
+    if args.all or args.macros:
+        archive('shared-macros',macro_files())
+        for name in ['stop.g','adaptive_mesh.g']:
+            (ROOT/'dist'/name).write_bytes((ROOT/'macros'/name).read_bytes())
+    if args.all or args.profiles:
+        for ident,selection in read('slicer/profiles.json').items():
+            archive('profile-'+ident,profile_files(selection))
     if args.all:
         for recipe in sorted((ROOT/'recipes').glob('*.json')):
             files = build(recipe, ROOT/'dist'/recipe.stem)
-            with zipfile.ZipFile(ROOT/'dist'/(recipe.stem+'.zip'), 'w', zipfile.ZIP_DEFLATED) as archive:
-                for name,value in sorted(files.items()):
-                    info = zipfile.ZipInfo(name, (2026,10,21,0,0,0))
-                    info.compress_type = zipfile.ZIP_DEFLATED
-                    archive.writestr(info, value)
-            print('Built ' + recipe.stem)
+            archive('example-'+recipe.stem,files)
     elif args.recipe and args.output:
         build(args.recipe.resolve(), args.output.resolve())
-    else:
+    elif not args.macros and not args.profiles:
         parser.error('Use --all or --recipe FILE --output DIRECTORY')
 
 if __name__ == '__main__':

@@ -1,0 +1,17 @@
+{
+  "griffin-0.6-pla": {
+    "toolhead": "griffin-0.6",
+    "process": "griffin-0.6-layer-0.2",
+    "material": "pla-griffin-0.6"
+  },
+  "griffin-0.8-addnorth-epla": {
+    "toolhead": "griffin-0.8",
+    "process": "griffin-0.8-layer-0.4",
+    "material": "addnorth-epla-griffin-0.8"
+  },
+  "ultra-1.8-formfutura-epla": {
+    "toolhead": "ultra-1.8",
+    "process": "ultra-1.8-layer-1.0",
+    "material": "formfutura-epla-ultra-1.8"
+  }
+}

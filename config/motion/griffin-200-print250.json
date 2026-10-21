@@ -1,6 +1,5 @@
 {
   "max_feedrate_command": "M203 X12000 Y12000",
-  "travel_acceleration": 800,
   "slicer_time_estimates": {
     "machine_max_acceleration_e": "2000,2000",
     "machine_max_acceleration_extruding": "250,250",

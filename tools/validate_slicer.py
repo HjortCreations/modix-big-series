@@ -1,12 +1,13 @@
 """Slice generated presets with an existing local PrusaSlicer; no printer access."""
 import argparse
+import configparser
 import hashlib
 import json
 import math
 from pathlib import Path
 import re
 import subprocess
-from build import ROOT, build, compose, read
+from build import ROOT, build, compose, read, profile_files
 
 def box(path):
     vertices=[(x,y,z) for z in [0,10] for y in [0,100] for x in [0,250]]
@@ -81,7 +82,32 @@ def validate(slicer, work):
         caps=[float(cfg[k]) for k in ['max_volumetric_speed','filament_max_volumetric_speed'] if float(cfg.get(k,0))>0]
         assert paths>100
         if caps:assert qmax<=min(caps)*1.01,(recipe.name,qmax,caps)
+        # Use the independent print/material bundle with an existing printer preset.
+        standalone=profile_files(read('recipes/'+recipe.name))
+        bundle=configparser.ConfigParser(interpolation=None)
+        bundle.read_string(standalone['PrusaSlicer-process-material.ini'].decode())
+        selected=dict(groups['printer'])
+        for name in bundle.sections():selected.update(dict(bundle[name]))
+        for key,name in [('start_gcode','start'),('end_gcode','end'),('before_layer_gcode','before-layer')]:
+            selected[key]=standalone['gcode/'+name+'.gcode'].decode().rstrip().replace('\n',r'\n')
+        independent=dest/'independent-profile.ini'
+        independent.write_text(''.join(f'{k} = {v}\n' for k,v in sorted(selected.items())))
+        independent_output=dest/'independent-profile.gcode'
+        subprocess.run([str(slicer),'--load',str(independent),'--export-gcode','--center','300,300',
+                        '--output',str(independent_output),str(model)],check=True)
+        independent_commands=commands(independent_output.read_text())
+        assert not any(c.startswith('M203 ') for c in independent_commands)
+        assert next(c for c in startup if c.startswith('M204 ')) in independent_commands
+        assert next(c for c in startup if c.startswith('M572 ')) in independent_commands
+        assert independent_commands[-3:]==['M400','M300 S222 P1111','M0']
+        mesh=next(c for c in independent_commands if c.startswith('M98 P"adaptive_mesh.g"'))
+        assert re.search(r' L\d+ F\d+ R\d+ E\d+$',mesh)
+        independent_paths,independent_flow=flow(independent_output.read_text(),cfg['filament_diameter'])
+        assert independent_paths>100
+        if caps:assert independent_flow<=min(caps)*1.01
         results.append({'recipe':recipe.stem,'extruding_paths_checked':paths,'maximum_nominal_flow_mm3_s':qmax,
+                        'independent_profile_sliced_with_existing_printer':True,
+                        'independent_profile_retains_machine_speed_limits':True,
                         'configured_volumetric_caps':caps,'gcode_sha256':hashlib.sha256(output.read_bytes()).hexdigest()})
     report={'slicer':str(slicer),'status':'Offline generated G-code checks passed',
             'recipes':results,'physical_test':False,'printer_files_written':False,'GUI_bundle_import_verified':False}

@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import subprocess
 from types import SimpleNamespace as NS
-from build import ROOT, compose, read, text
+from build import ROOT, compose, read, text, macro_files, profile_files
 
 def expression(source, variables, axes, offsets, params=None):
     for index, axis in enumerate(axes):
@@ -25,14 +25,15 @@ def variable(source, name, variables, axes, offsets, params=None):
 
 def composition():
     recipes = sorted((ROOT/'recipes').glob('*.json'))
-    assert len(recipes) == 3
+    assert recipes
     for path in recipes:
         recipe = json.loads(path.read_text())
         files, groups = compose(recipe)
         assert 'sys/config.g' not in files
         assert len([k for k in files if k.startswith('sys/')]) == 9
-        assert files['sys/stop.g'] == (ROOT/'firmware/common/stop.g').read_bytes()
-        assert files['sys/g32_u.g'] == (ROOT/'firmware/common/g32_u.g').read_bytes()
+        assert files['sys/stop.g'] == (ROOT/'macros/stop.g').read_bytes()
+        assert files['sys/g32_u.g'] == (ROOT/'macros/g32_u.g').read_bytes()
+        assert files['sys/adaptive_mesh.g'] == (ROOT/'macros/adaptive_mesh.g').read_bytes()
         assert all(not re.search(rb'@[A-Z_]+@', data) for data in files.values())
         manifest = json.loads(files['manifest.json'])
         assert all(hashlib.sha256(files[k]).hexdigest()==sha for k,sha in manifest['files'].items())
@@ -69,7 +70,7 @@ def composition():
     return len(recipes)
 
 def geometry():
-    u = text('firmware/common/g32_u.g')
+    u = text('macros/g32_u.g')
     assert '#move.axes[2].drivers != 4' in u
     assert 'sensors.probes[0].type != 9' in u
     assert 'global.bigUTiltValid && move.axes[2].homed && global.bigUTiltHead = param.H' in u
@@ -93,7 +94,7 @@ def geometry():
                 files,_=compose(recipe)
                 mesh=files['sys/adaptive_mesh.g'].decode()
                 for bounds in [(0,0,10,10),(width-10,depth-10,width,depth),(100,100,150,150),(0,0,width,depth)]:
-                    params=dict(zip('XYAB',bounds));m={}
+                    params=dict(zip('XYAB',bounds));m=dict(zip(['inset_left','inset_front','inset_right','inset_rear'],insets))
                     for name in ['ox','oy','safe_min_x','safe_max_x','safe_min_y','safe_max_y','mesh_min_x','mesh_max_x','mesh_min_y','mesh_max_y']:
                         variable(mesh,name,m,axes,offsets,params)
                     assert m['safe_min_x'] <= m['mesh_min_x'] < m['mesh_max_x'] <= m['safe_max_x']
@@ -104,7 +105,7 @@ def geometry():
     return count
 
 def stop_checks():
-    stop=text('firmware/common/stop.g')
+    stop=text('macros/stop.g')
     e=re.findall(r'^\s*set var.parkDeltaZ = (max\(.+)$',stop,re.M)[-1]
     count=0
     for maximum in [250,1000,1200]:
@@ -135,7 +136,7 @@ def privacy():
     patterns=[r'\b(?:\d{1,3}\.){3}\d{1,3}\b',r'\b(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}\b',
               r'(?m)^\s*M(?:551|587)\b',r'(?m)^\s*(?:printhost_apikey|print_host)\s*=\s*\S+',
               r'\bgh[pousr]_[A-Za-z0-9]{20,}\b',r'\b[A-Z0-9]{5}(?:-[A-Z0-9]{5}){5}\b']
-    allowed={'firmware','config','slicer','recipes','examples','tools','docs','.github'}
+    allowed={'macros','firmware','config','slicer','recipes','examples','tools','docs','.github'}
     tracked = set()
     if (ROOT/'.git').exists():
         tracked = set(subprocess.check_output(['git','ls-files','-z'],cwd=ROOT).decode().split('\0'))
@@ -147,13 +148,38 @@ def privacy():
         if len(rel.parts)>1:assert rel.parts[0] in allowed,rel
         value=path.read_text(encoding='utf-8-sig')
         for pattern in patterns:assert not re.search(pattern,value),('Sensitive data pattern',rel)
-        if rel.parts[0] in {'slicer','config','recipes','examples','firmware'}:
+        if rel.parts[0] in {'macros','slicer','config','recipes','examples','firmware'}:
             assert not re.search(r'(?m)^\s*(?:G31\b|M556\b|M307\b|M593\b)',value),('Local calibration',rel)
     for folder in ['slicer/materials','slicer/processes','slicer/toolheads']:
         for path in (ROOT/folder).glob('*.json'):
             obj=json.loads(path.read_text())
             assert not {'bed_shape','max_print_height','axis_max','screw_x','screw_y'} & set(obj.get('settings',{})),path
 
+def independence():
+    import build as builder
+    original=builder.read
+    def without_machine(path):
+        assert not str(path).startswith(('config/models/','config/hardware/','config/motion/','recipes/'))
+        return original(path)
+    selections=read('slicer/profiles.json')
+    builder.read=without_machine
+    try:
+        macros=macro_files()
+        assert macros['stop.g']==(ROOT/'macros/stop.g').read_bytes()
+        assert macros['adaptive_mesh.g']==(ROOT/'macros/adaptive_mesh.g').read_bytes()
+        for selection in selections.values():
+            files=profile_files(selection)
+            assert not any(k.startswith(('sys/','reference/')) for k in files)
+            bundle=configparser.ConfigParser(interpolation=None)
+            bundle.read_string(files['PrusaSlicer-process-material.ini'].decode())
+            assert {s.split(':')[0] for s in bundle.sections()}=={'print','filament'}
+            assert not any(key in files['PrusaSlicer-process-material.ini'].decode()
+                           for key in ['bed_shape','max_print_height','BIG-Meter','BIG-120Z'])
+            assert not re.search(r'^M203\b',files['gcode/start.gcode'].decode(),re.M)
+    finally:
+        builder.read=original
+    return len(selections)
+
 if __name__=='__main__':
     privacy()
-    print(f'PASS: {composition()} recipes; {geometry()} actual U/mesh geometry cases; {stop_checks()} bounded Z cases; warm retract, cache, bundles and privacy')
+    print(f'PASS: {independence()} machine-independent profiles; {composition()} example recipes; {geometry()} actual U/mesh geometry cases; {stop_checks()} bounded Z cases; shared macro identity, warm retract, cache and privacy')

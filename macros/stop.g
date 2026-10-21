@@ -1,4 +1,4 @@
-; Shared Modix BIG end-of-job routine: firmware/common/stop.g.
+; Shared Modix BIG end-of-job routine: macros/stop.g.
 ; Generated copies must match this source; no machine-specific calibration here.
 ; Keep Modix cooling; park at machine X1 Y1 after the bounded Z lowering.
 ; D1 reports the plan before any heater, motion or modal change.

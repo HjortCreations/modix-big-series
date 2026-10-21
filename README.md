@@ -1,66 +1,66 @@
 # Modix BIG Series
 
-Shared RepRapFirmware macros and PrusaSlicer profiles for the Modix BIG series.
-**Griffin and Griffin ULTRA toolheads are independent of machine size.**
+Reusable printer macros and independent slicer profiles for the Modix BIG series.
+Choose the feature you need. A machine example's name does not limit a shared feature to that model or nozzle.
 
-## Download and use
+## Printer macros â€” use independently
 
-Download a prebuilt ZIP package from [Releases](https://github.com/HjortCreations/modix-big-series/releases).
-Read the [installation guide](docs/installation.md) before copying system files to a printer.
-Packages extend an existing, working Modix configuration; they do not replace `config.g`.
+| Feature | Open the file | Purpose |
+|---|---|---|
+| Shared print end | **[stop.g](macros/stop.g)** | Guard warm retraction, lower the bed within Z limits, park X1 Y1 and keep Z holding |
+| Adaptive mesh | **[adaptive_mesh.g](macros/adaptive_mesh.g)** | Probe around this print using configured travel, probe offsets and head clearance |
+| Adaptive U-tilt | [g32_u.g](macros/g32_u.g) | Align a four-motor bed using alternating U paths and adaptive probe depth |
+| Cold movement test | [axis_test.g](macros/axis_test.g) | Test configured XYZ motion without heating or extrusion |
 
-| Package | Work envelope, mm | Toolhead / nozzle | Material / process |
-|---|---|---|---|
-| `big-120z-griffin-0.6` | BIG-120Z V4, 600 × 600 × 1200 | Griffin 0.6 mm | PLA, 0.2 mm layers |
-| `big-meter-griffin-0.8` | BIG-Meter V4 reference, 980 × 1000 × 1000 | Griffin 0.8 mm | addnorth ePLA, 0.4 mm layers |
-| `big-meter-ultra-1.8` | BIG-Meter upgraded legacy variant, 965 × 980 × 1000 | ULTRA 1.8 mm | FormFutura ePLA, 1.0 mm layers |
+**The same stop.g and adaptive_mesh.g files are used across machine sizes and nozzle diameters.**
+They read the machine's configured values at runtime. No BIG-60, BIG-120Z, BIG-Meter or BIG-180X recipe is needed to download or use them.
 
-These are established work envelopes, not guaranteed dimensions for every machine of the same model.
-The sources have been migrated and checked offline. **The newly assembled packages have not yet been installed or physically tested.**
-More BIG sizes can be added once their geometry and hardware have been verified. IDEX and other Z-drive arrangements are not currently supported.
+[Macro instructions and compatibility requirements](macros/README.md) Â· [Download individual files or shared-macros.zip](https://github.com/HjortCreations/modix-big-series/releases)
 
-## Where settings belong
+Compatibility depends on the actual firmware, axes, probe and tool mapping. Adaptive mesh needs compatible Cartesian RepRapFirmware and a commissioned probe; U-tilt additionally needs four independently driven Z motors. Physical test coverage is documented separately.
 
-| Component | Responsibility |
-|---|---|
-| `firmware/common/` | One U-tilt routine, one stop.g, adaptive mesh and axis test |
-| `config/models/` | Work envelope and Z-screw geometry |
-| `config/hardware/`, `firmware/hardware/` | Controller, endstop directions and existing homing routines |
-| `config/motion/`, `config/motors/` | Motion limits, time estimates and optional motor parameters |
-| `config/toolheads/` | Toolhead clearance; no universal BLTouch offset |
-| `slicer/toolheads/` | Nozzle size, retraction and layer-height limits |
-| `slicer/processes/` | Layers, walls, infill, speeds and print acceleration |
-| `slicer/materials/` | Temperature, cooling, flow and pressure advance for a material/toolhead/nozzle combination |
-| `slicer/gcode/` | Shared start, end and layer-change G-code |
-| `recipes/` | Small files that select a combination of components |
+## Slicer profiles â€” choose by head, nozzle and material
 
-The same ULTRA process and material components can be reused on another model without copying them.
-The [example recipe](examples/big-120z-ultra-1.8.json) demonstrates this composition; it is not a commissioned machine profile.
+| Independent profile | Process | Material |
+|---|---|---|
+| Griffin 0.6 mm | 0.2 mm layers | PLA |
+| Griffin 0.8 mm | 0.4 mm layers | addnorth ePLA |
+| Griffin ULTRA 1.8 mm | 1.0 mm layers | FormFutura ePLA |
 
-## Shared behaviour
+**A ULTRA process/material profile is the same on BIG-60, BIG-Meter, BIG-180X or another compatible BIG size.**
+The printer preset supplies machine geometry and hardware limits separately.
+The profile packages contain print/material presets, shared start/end snippets and head settings without firmware or model geometry.
 
-- Heat the nozzle during homing. Home all axes if Z is unknown; otherwise home XY only.
-- Run conditional G32: reuse successful bed alignment while Z remains held and the toolhead is unchanged. `G32 S1` forces realignment.
-- Probe an adaptive mesh for each print. The U-shaped tilt path reverses between passes.
-- Retain the Modix end sequence through M0 → stop.g: retract while hot, turn off tool heating, lower the bed towards at least Z300 without exceeding Z-max, park at X1 Y1 and retain Z holding current.
-- Set acceleration, axis speed limits and pressure advance in start G-code. Slicer acceleration overrides remain zero.
-- Leave bed heating disabled and use the same descriptive output filename format throughout.
+[Slicer instructions](slicer/README.md) Â· [Download profile- ZIP packages](https://github.com/HjortCreations/modix-big-series/releases)
 
-ULTRA 1.8 mm working settings: **100 mm³/s, 235/215 °C, PA 0.035, print/travel acceleration 250/800 mm/s²**,
-1.0 mm layers, a 1.2 mm first layer and 1.2 mm retraction at 35 mm/s. These are operator-reported working settings, not a measured maximum throughput.
-G-code resolution remains **0.0125 mm** in the migrated baseline; the proposed 0.05 mm setting has not been applied automatically.
+The current ULTRA 1.8 mm/ePLA defaults are 100 mmÂ³/s, 235/215 Â°C, PA 0.035,
+print/travel acceleration 250/800 mm/sÂ², 1.0 mm layers and a 1.2 mm first layer.
+These are working defaults for that head/nozzle/material, independent of bed size, not a measured maximum throughput.
+G-code resolution remains 0.0125 mm; the proposed 0.05 mm change has not been applied automatically.
 
-## Build and check
+## Machine configuration and optional examples
 
-Requires Python 3.10+ with no additional Python packages.
+Keep each machine's working configuration: dimensions, wiring, motor mapping, hardware limits, probe offset and PID calibration.
+Individual calibration and network settings stay outside this repository.
+
+[Machine combination examples](recipes/README.md) assemble the independent components with particular geometry and homing references.
+The example- ZIPs are convenient complete combinations. **They are not a list of the models that can use the shared macros or slicer profiles.**
+Their newly assembled files have not been physically commissioned as complete packages.
+
+## Build and maintain
+
+Requires Python 3.10+; no additional Python packages. Output goes to the ignored dist/ directory.
 
 ```console
 python tools/check.py
+python tools/build.py --macros
+python tools/build.py --profiles
 python tools/build.py --all
 ```
 
-Output goes into the ignored dist/ directory. Each ZIP contains a manifest, system files and two slicer formats:
-PrusaSlicer.ini for **Import Config**, and PrusaSlicer-bundle.ini for **Import Config Bundle**.
-The bundle uses the same process and material preset names across machine sizes.
+- macros/: the single source for shared printer routines.
+- slicer/: shared defaults, head/nozzle settings, processes, materials and start/end G-code.
+- config/: separate model, hardware, head-clearance and motor/motion references.
+- recipes/: optional example combinations of those components.
 
-[Maintenance rules](AGENTS.md) · [Components and changes](docs/maintenance.md) · [Validation status](docs/validation.md)
+[Maintenance rules](AGENTS.md) Â· [Where to make changes](docs/maintenance.md) Â· [Validation status](docs/validation.md)

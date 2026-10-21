@@ -1,9 +1,13 @@
 # Maintenance rules
 
+- Start with macros/README.md and slicer/README.md. Reusable features and slicer profiles are the primary products; named machine recipes are optional integration examples.
+- Never infer a feature's compatibility from a recipe filename, the first test machine or its nozzle size. A BIG-120Z example is not a restriction on stop.g, adaptive mesh or ULTRA profiles.
+- Compatibility statements must describe actual firmware, axes, probe and hardware requirements. Keep physical test coverage separate from compatibility; do not claim all printer types are supported.
+- Shared macros must be usable without a model/nozzle recipe. Print/material profiles must build without model, hardware or motion components. Keep machine geometry in the separate printer configuration.
 - Write repository documentation, code comments, user-facing messages and release notes in English.
 - This repository contains reusable components. Keep customer names, addresses, IP/MAC addresses, controller UIDs, CRM IDs, passwords, network settings and service notes in private local service records outside the repository.
 - Update the appropriate component instead of adding a complete machine copy. Keep model geometry out of toolhead, material and process profiles. Material and process profiles must not depend on model names.
-- firmware/common/stop.g, firmware/common/g32_u.g and slicer/gcode/ are the sole sources for their respective shared routines. Never edit generated copies manually.
+- macros/stop.g, macros/g32_u.g and slicer/gcode/ are the sole sources for their respective shared routines. Never edit generated copies manually.
 - Do not version config_probe.g, PID files, M556 values, input-shaper settings, network configuration or individual machine calibration. Preserve each machine's working configuration and local backup.
 - Changes to motion limits, temperatures or algorithms must be intentional and separate from cleanup. Never describe a repository cleanup as physical testing.
 - A recipe selects model, geometry, hardware, toolhead/nozzle, process, material and motion components. State the actual validation status. A model name does not establish wiring, homing direction or probe offsets.

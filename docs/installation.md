@@ -1,5 +1,7 @@
 # Installing an example combination package
 
+For the ready-to-import PrusaSlicer starter, use the [slicer download and import instructions](../slicer/README.md).
+
 For individual features, use the [macro instructions](../macros/README.md). For print/material presets only, use the [slicer instructions](../slicer/README.md). Neither requires a model recipe.
 
 This page covers optional example- packages. They are **overlays**, not universal, complete machine configurations.

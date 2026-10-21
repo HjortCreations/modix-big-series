@@ -1,0 +1,10 @@
+{
+  "filename": "Hjort-Creations-Modix-BIG-PrusaSlicer.ini",
+  "process": "big-starter-layer-0.4",
+  "variants": [
+    {"toolhead": "griffin-0.8", "material": "pla-starter-griffin", "label": "Griffin 0.8"},
+    {"toolhead": "griffin-high-flow-0.8", "material": "pla-starter-griffin-high-flow", "label": "Griffin High-Flow 0.8"},
+    {"toolhead": "ultra-1.4", "material": "pla-starter-ultra", "label": "ULTRA 1.4"}
+  ],
+  "default_model": "big-60"
+}

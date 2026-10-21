@@ -3,6 +3,23 @@
 Reusable printer macros and independent slicer profiles for the Modix BIG series.
 Choose the feature you need. A machine example's name does not limit a shared feature to that model or nozzle.
 
+## Get started in PrusaSlicer
+
+**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.0/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+
+Import the file with **File > Import > Import Config Bundle**. Select your printer/head,
+the **Hjort Creations - BIG Starter - Layer 0.4** print profile and the matching PLA profile.
+No scripts or building are needed. The file contains:
+
+- 15 printer presets: BIG-60, BIG-120X, BIG-120Z, BIG-180X and BIG-Meter, each with Griffin 0.8, Griffin High-Flow 0.8 and ULTRA 1.4.
+- One shared print profile with automatic line widths, 0.4 mm layers and first layer, and 250/800 mm/s² print/travel acceleration in start G-code.
+- Three generic PLA starting profiles: Griffin **30**, High-Flow **40** and ULTRA **60 mm³/s**. Each targets **45 s** minimum layer time with a 5 mm/s minimum print speed.
+- Dependencies matching each PLA profile to its head across machine sizes. Incompatible selections can still be overridden manually.
+
+The machine must already have the shared stop.g and adaptive_mesh.g installed and a working bed.g.
+This slicer file does not install firmware or change the machine's own axis speed limits.
+[Setup, dimensions and starting-value notes](slicer/README.md)
+
 ## Printer macros — use independently
 
 | Feature | Open the file | Purpose |
@@ -20,6 +37,9 @@ They read the machine's configured values at runtime. No BIG-60, BIG-120Z, BIG-M
 Compatibility depends on the actual firmware, axes, probe and tool mapping. Adaptive mesh needs compatible Cartesian RepRapFirmware and a commissioned probe; U-tilt additionally needs four independently driven Z motors. Physical test coverage is documented separately.
 
 ## Slicer profiles — choose by head, nozzle and material
+
+The all-in-one starter above is the simplest starting point. The independent packages below
+preserve earlier, more specific setups for users who already have a printer preset.
 
 | Independent profile | Process | Material |
 |---|---|---|
@@ -53,6 +73,7 @@ Requires Python 3.10+; no additional Python packages. Output goes to the ignored
 
 ```console
 python tools/check.py
+python tools/build.py --starter
 python tools/build.py --macros
 python tools/build.py --profiles
 python tools/build.py --all

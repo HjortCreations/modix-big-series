@@ -1,0 +1,7 @@
+{
+  "name": "Griffin High-Flow",
+  "required_primary_tool_heaters": 1,
+  "nozzle_insets_mm": [2, 2, 2, 2],
+  "home_front_mm": 5,
+  "status": "Griffin-family clearance starting point; verify the actual mounted nozzle and probe. This does not contain an individual probe offset."
+}

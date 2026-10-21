@@ -1,0 +1,6 @@
+{
+  "name": "griffin-high-flow-0.8",
+  "head": "griffin-high-flow",
+  "base": "griffin-0.8",
+  "settings": {"nozzle_diameter": "0.8", "nozzle_high_flow": "1"}
+}

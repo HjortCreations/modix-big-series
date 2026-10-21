@@ -11,10 +11,16 @@ ROOT = Path(__file__).resolve().parents[1]
 def read(path):
     return json.loads((ROOT / path).read_text(encoding='utf-8-sig'))
 
-def component(group, ident):
+def component(group, ident, ancestors=()):
     if not re.fullmatch(r'[a-z0-9.-]+', ident):
         raise ValueError('Invalid component identifier')
-    return read(f'{group}/{ident}.json')
+    if ident in ancestors:
+        raise ValueError('Circular component inheritance')
+    value = read(f'{group}/{ident}.json')
+    if 'base' in value:
+        parent = component(group, value['base'], (*ancestors, ident))
+        value = {**parent, **value, 'settings': {**parent.get('settings', {}), **value.get('settings', {})}}
+    return value
 
 def text(path):
     return (ROOT / path).read_text(encoding='utf-8-sig')
@@ -36,6 +42,9 @@ def start_code(process, material, head, max_feedrate=None, insets=None):
     value = template('slicer/gcode/start.gcode', substitutions)
     if max_feedrate is None:
         value = value.replace(' ; Axis limits, mm/min', '; Keep the existing machine axis speed limits')
+    if material['pressure_advance'] is None:
+        # The all-in-one starter uses the selected filament's own PA command.
+        value = ''.join(line for line in value.splitlines(keepends=True) if not line.startswith('M572 '))
     return value
 
 def bed_wrapper(head, insets):
@@ -73,11 +82,67 @@ def profile_files(selection):
 
 def macro_files():
     files = {name:text('macros/'+name).encode() for name in ['stop.g','adaptive_mesh.g','g32_u.g','axis_test.g']}
-    for ident in ['griffin','griffin-ultra']:
+    for ident in ['griffin','griffin-high-flow','griffin-ultra']:
         head = component('config/toolheads',ident)
         files['bed-'+ident+'.g'] = bed_wrapper(head,head['nozzle_insets_mm'])
     files['README.md'] = text('macros/README.md').encode()
     return files
+
+def starter_groups():
+    """Ready-to-import presets; machine dimensions never select material/process values."""
+    selection = read('slicer/starter.json')
+    process = component('slicer/processes', selection['process'])
+    print_name = process['name']
+    printing = {**read('slicer/common/print.json'), **process['settings']}
+    printing.update(print_settings_id=print_name,
+                    compatible_printers_condition='printer_notes=~/.*HC_PROFILE_FAMILY=MODIX_BIG;.*/',
+                    notes='Generic BIG starting process; change layer height to suit your nozzle and part.')
+    groups = {'print:'+print_name: printing}
+    machines = read('slicer/machines.json')['models']
+    estimates = component('config/motion', 'nema23-250')['slicer_time_estimates']
+    estimates.update(machine_max_feedrate_y='250,250', machine_max_feedrate_z='6.6667,6.6667',
+                     machine_max_acceleration_extruding='250,250', machine_max_acceleration_travel='800,800')
+    for variant in selection['variants']:
+        tool = component('slicer/toolheads', variant['toolhead'])
+        head = component('config/toolheads', tool['head'])
+        material = component('slicer/materials', variant['material'])
+        filament_name = material['name']
+        filament = {**read('slicer/common/filament.json'), **material['settings']}
+        filament.update(filament_settings_id=json.dumps(filament_name),
+                        compatible_printers_condition=f'printer_notes=~/.*HC_PROFILE_FAMILY=MODIX_BIG;.*/ and printer_notes=~/.*HC_TOOLHEAD={tool["head"]};.*/',
+                        start_filament_gcode=json.dumps(f'M572 S{material["pressure_advance"]} ; Basic start value for the {head["name"]} toolhead'),
+                        filament_notes=json.dumps('Starting values for tuning; 45 s cooling target can be limited by the minimum print speed.'))
+        groups['filament:'+filament_name] = filament
+        for ident,machine in machines.items():
+            if not machine.get('starter_enabled', True):
+                continue
+            bounds = (component('config/models', machine['model'])['variants'][machine['geometry_variant']]['axis_max']
+                      if 'model' in machine else machine['axis_max'])
+            if len(bounds) != 3 or min(bounds) <= 0 or bounds[2] > 1200:
+                raise ValueError('Invalid starter build volume')
+            name = 'Hjort Creations - '+machine['name']+' - '+variant['label']
+            printer = {**read('slicer/common/printer.json'), **tool['settings'], **estimates}
+            printer.update(printer_settings_id=name, printer_model=machine['name'], printer_variant=printer['nozzle_diameter'],
+                           printer_vendor='', use_relative_e_distances='1', silent_mode='0', variable_layer_height='1',
+                           bed_shape=f'0x0,{bounds[0]}x0,{bounds[0]}x{bounds[1]},0x{bounds[1]}', max_print_height=str(bounds[2]),
+                           default_print_profile=print_name, default_filament_profile=json.dumps(filament_name),
+                           printer_notes=json.dumps(f'HC_PROFILE_FAMILY=MODIX_BIG; HC_TOOLHEAD={tool["head"]}; Single-tool RRF reference; verify actual travel and install required shared macros.'),
+                           start_gcode=start_code(process, {'pressure_advance':None}, head).rstrip().replace('\n', r'\n'),
+                           end_gcode=text('slicer/gcode/end.gcode').rstrip().replace('\n', r'\n'),
+                           before_layer_gcode=text('slicer/gcode/before-layer.gcode').rstrip().replace('\n', r'\n'),
+                           host_type='duet', print_host='', printhost_apikey='')
+            groups['printer:'+name] = printer
+    default_model = machines[selection['default_model']]['name']
+    groups['presets'] = {'print':print_name, 'filament':component('slicer/materials',selection['variants'][0]['material'])['name'],
+                         'printer':'Hjort Creations - '+default_model+' - '+selection['variants'][0]['label']}
+    return groups
+
+def starter_bundle():
+    groups = starter_groups()
+    value = '# Hjort Creations Modix BIG starter profiles. Import Config Bundle in PrusaSlicer.\n'
+    for name,settings in groups.items():
+        value += '\n['+name+']\n'+''.join(f'{k} = {v}\n' for k,v in sorted(settings.items()))
+    return value.encode('utf-8')
 
 def compose(recipe):
     model = component('config/models', recipe['model'])
@@ -182,7 +247,13 @@ def main():
     parser.add_argument('--all', action='store_true')
     parser.add_argument('--macros', action='store_true')
     parser.add_argument('--profiles', action='store_true')
+    parser.add_argument('--starter', action='store_true')
     args = parser.parse_args()
+    if args.all or args.starter:
+        destination = ROOT/'dist'/read('slicer/starter.json')['filename']
+        destination.parent.mkdir(parents=True,exist_ok=True)
+        destination.write_bytes(starter_bundle())
+        print('Built '+destination.name)
     if args.all or args.macros:
         archive('shared-macros',macro_files())
         for name in ['stop.g','adaptive_mesh.g']:
@@ -196,8 +267,8 @@ def main():
             archive('example-'+recipe.stem,files)
     elif args.recipe and args.output:
         build(args.recipe.resolve(), args.output.resolve())
-    elif not args.macros and not args.profiles:
-        parser.error('Use --all or --recipe FILE --output DIRECTORY')
+    elif not args.macros and not args.profiles and not args.starter:
+        parser.error('Use --all, --starter, --profiles, --macros or --recipe FILE --output DIRECTORY')
 
 if __name__ == '__main__':
     main()

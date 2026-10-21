@@ -1,0 +1,6 @@
+{
+  "name": "Hjort Creations - BIG Starter - Layer 0.4",
+  "base": "ultra-1.8-layer-1.0",
+  "print_acceleration": 250,
+  "settings": {"layer_height": "0.4", "first_layer_height": "0.4", "automatic_infill_combination": "0"}
+}

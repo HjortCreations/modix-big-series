@@ -1,0 +1,7 @@
+{
+  "name": "Hjort Creations - PLA - Griffin High-Flow",
+  "base": "pla-starter-griffin",
+  "pressure_advance": 0.015,
+  "status": "40 mm3/s PLA cap requested by the operator for a conservative High-Flow baseline; 60 mm3/s is deliberately not used. Pressure advance remains a starting value.",
+  "settings": {"filament_max_volumetric_speed": "40"}
+}

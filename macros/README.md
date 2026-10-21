@@ -72,7 +72,7 @@ This feature requires four independently driven Z motors, matching M671 screw co
 Cartesian XYZ, BLTouch probe0/servo0 and the machine's own config_probe.g and homing routines.
 Those requirements, rather than a BIG model name or nozzle diameter, define compatibility.
 
-Install g32_u.g and choose bed-griffin.g or bed-griffin-ultra.g from the shared ZIP.
+Install g32_u.g and choose bed-griffin.g, bed-griffin-high-flow.g or bed-griffin-ultra.g from the shared ZIP.
 Copy the selected wrapper as sys/bed.g. The wrapper selects head clearance; the core reads machine geometry at runtime.
 
 For cached alignment to remain valid, add this hook before motion/probing in the existing

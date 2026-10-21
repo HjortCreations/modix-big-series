@@ -11,12 +11,19 @@ Change each setting in one place. Shared macros and independent slicer profiles 
 | Toolhead movement/probing clearance | config/toolheads/; a local nozzle_insets_mm override if needed |
 | PID, BLTouch offsets, skew, input shaping | Private machine calibration; never a toolhead default |
 | Stepper model and TMC parameters | config/motors/ + firmware/motors/; requires an explicit choice |
-| Axis speed limits / travel acceleration | config/motion/ |
+| Axis speed limits in optional example start code | config/motion/ |
 | Default travel acceleration | slicer/common/startup.json |
 | Slicer time estimates | The motion component's slicer_time_estimates; these do not configure firmware |
 | Layers, walls, infill, print acceleration | slicer/processes/ |
 | Retraction and nozzle size | slicer/toolheads/ |
 | Temperature, flow, fan and pressure advance | slicer/materials/ |
+| Ready-to-import starter choices | slicer/starter.json |
+| Sourced starter model sizes; no firmware geometry | slicer/machines.json |
+
+The starter is one generated INI with all supported model/head combinations. Never maintain 15 hand-edited copies.
+Process/material/nozzle components can use a base component within the same group; the builder resolves inheritance.
+Dependencies use stable family/head markers in printer_notes, not display names, customer names or a list of model names.
+The starter's selected filament emits its PA; earlier independent/example packages retain their existing PA placement.
 
 Build local overrides with python tools/build.py --recipe FILE --output DIRECTORY.
 Store local files outside Git or under the ignored local/ directory. Their data appears in the local package manifest, not in the repository or published release packages.

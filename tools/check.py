@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import subprocess
 from types import SimpleNamespace as NS
-from build import ROOT, compose, read, text, macro_files, profile_files
+from build import ROOT, compose, read, text, macro_files, profile_files, starter_groups, starter_bundle
 
 def expression(source, variables, axes, offsets, params=None):
     for index, axis in enumerate(axes):
@@ -183,6 +183,37 @@ def independence():
         builder.read=original
     return len(selections)
 
+def starter_checks():
+    groups=starter_groups()
+    bundle=configparser.ConfigParser(interpolation=None)
+    bundle.read_string(starter_bundle().decode('utf-8'))
+    assert {name:dict(bundle[name]) for name in bundle.sections()}==groups
+    printers={name:value for name,value in groups.items() if name.startswith('printer:')}
+    filaments={name:value for name,value in groups.items() if name.startswith('filament:')}
+    processes=[value for name,value in groups.items() if name.startswith('print:')]
+    assert len(processes)==1 and len(filaments)==3
+    enabled=[m for m in read('slicer/machines.json')['models'].values() if m.get('starter_enabled',True)]
+    assert len(printers)==len(enabled)*3
+    process=processes[0]
+    assert process['automatic_extrusion_widths']=='1'
+    assert all(v=='0' for k,v in process.items() if k.endswith(('_extrusion_width','_acceleration')))
+    assert process['max_volumetric_speed']=='0'
+    assert sorted(float(v['filament_max_volumetric_speed']) for v in filaments.values())==[30,40,60]
+    for value in filaments.values():
+        assert value['slowdown_below_layer_time']=='45' and value['min_print_speed']=='5'
+        assert value['bed_temperature']==value['first_layer_bed_temperature']=='0'
+        assert 'M572 S' in value['start_filament_gcode']
+        assert 'HC_TOOLHEAD=' in value['compatible_printers_condition']
+    for name,value in printers.items():
+        assert value['default_filament_profile'].strip('"') in [n.split(':',1)[1] for n in filaments]
+        assert not re.search(r'\bM(?:203|572)\b',value['start_gcode'])
+        assert value['use_relative_e_distances']=='1' and value['machine_limits_usage']=='time_estimate_only'
+        assert float(value['min_layer_height']) <= float(process['layer_height']) <= float(value['max_layer_height'])
+        assert 'M204 P250 T800' in value['start_gcode']
+        assert value['end_gcode']==text('slicer/gcode/end.gcode').rstrip().replace('\n',r'\n')
+        assert value['print_host']==value['printhost_apikey']==''
+    return len(printers)
+
 if __name__=='__main__':
     privacy()
-    print(f'PASS: {independence()} machine-independent profiles; {composition()} example recipes; {geometry()} actual U/mesh geometry cases; {stop_checks()} bounded Z cases; shared macro identity, warm retract, cache and privacy')
+    print(f'PASS: {starter_checks()} starter printer presets; {independence()} machine-independent profiles; {composition()} example recipes; {geometry()} actual U/mesh geometry cases; {stop_checks()} bounded Z cases; shared macro identity, warm retract, cache and privacy')

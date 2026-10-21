@@ -7,7 +7,7 @@ import math
 from pathlib import Path
 import re
 import subprocess
-from build import ROOT, build, compose, read, profile_files
+from build import ROOT, build, compose, read, profile_files, starter_bundle
 
 def box(path):
     vertices=[(x,y,z) for z in [0,10] for y in [0,100] for x in [0,250]]
@@ -23,7 +23,7 @@ def box(path):
 def commands(value):
     return [c for line in value.splitlines() if (c:=line.split(';',1)[0].strip())]
 
-def flow(text, diameter):
+def flow(text, diameter, arc_length_tolerance=0.):
     pos=dict(X=0.,Y=0.,Z=0.);feed=0.;qmax=0.;paths=0;e=0.;relative=False
     area=math.pi*(float(diameter)/2)**2
     for line in commands(text):
@@ -43,10 +43,78 @@ def flow(text, diameter):
             t0,t1=math.atan2(pos['Y']-cy,pos['X']-cx),math.atan2(end['Y']-cy,end['X']-cx)
             angle=((t0-t1) if line.startswith('G2 ') else (t1-t0))%(2*math.pi)
             distance=math.hypot(radius*(angle or 2*math.pi),end['Z']-pos['Z'])
+            # Fitted sub-mm arcs retain extrusion from the original polyline.
+            # Account for its configured geometric resolution when checking a cap.
+            distance+=arc_length_tolerance
         if distance>.01 and de>0:
             qmax=max(qmax,de*area*feed/distance);paths+=1
         pos=end
     return paths,qmax
+
+def validate_starter(slicer, work, model):
+    """Use PrusaSlicer's native preset loader and compatibility evaluator in isolation."""
+    bundle=configparser.ConfigParser(interpolation=None)
+    bundle.read_string(starter_bundle().decode('utf-8'))
+    folder=work/'starter'
+    data=folder/'isolated-prusa-data'
+    data.mkdir(parents=True,exist_ok=True)
+    for section in bundle.sections():
+        if section=='presets':continue
+        group,name=section.split(':',1)
+        dest=data/group/(name+'.ini')
+        dest.parent.mkdir(exist_ok=True)
+        dest.write_text(''.join(f'{k} = {v}\n' for k,v in bundle[section].items()),encoding='utf-8')
+    (data/'PrusaSlicer.ini').write_text('version = 2.9.6\n\n[presets]\n'+''.join(f'{k} = {v}\n' for k,v in bundle['presets'].items()),encoding='utf-8')
+    results=[]
+    for index,section in enumerate(s for s in bundle.sections() if s.startswith('printer:')):
+        name=section.split(':',1)[1]
+        printer=bundle[section]
+        filament_name=printer['default_filament_profile'].strip('"')
+        output=folder/f'{index:02d}.gcode'
+        normalized=folder/f'{index:02d}.ini'
+        query=folder/f'{index:02d}-compatible.json'
+        # In 2.9.6 a successful query writes JSON but exits with status 1.
+        result=subprocess.run([str(slicer),'--datadir',str(data),'--printer-profile',name,
+                               '--query-print-filament-profiles','--output',str(query)],capture_output=True,text=True)
+        assert query.exists(),result.stderr
+        compatible=json.loads(query.read_text(encoding='utf-8'))
+        assert compatible['printer_profile']==name
+        listed=compatible['user_print_profiles']
+        assert len(listed)==1 and listed[0]['name']==printer['default_print_profile']
+        assert listed[0]['user_filament_profiles']==[filament_name],compatible
+        subprocess.run([str(slicer),'--datadir',str(data),'--printer-profile',name,
+                        '--print-profile',printer['default_print_profile'],'--material-profile',filament_name,
+                        '--save',str(normalized),'--export-gcode','--center','300,300',
+                        '--output',str(output),str(model)],check=True)
+        parser=configparser.ConfigParser(interpolation=None)
+        parser.read_string('[config]\n'+normalized.read_text(encoding='utf-8-sig'))
+        cfg=parser['config']
+        assert cfg['bed_shape']==printer['bed_shape'] and cfg['nozzle_diameter']==printer['nozzle_diameter']
+        assert cfg['max_print_height']==printer['max_print_height']
+        assert cfg['slowdown_below_layer_time']=='45' and cfg['min_print_speed']=='5'
+        assert cfg['automatic_extrusion_widths']=='1' and cfg['layer_height']=='0.4'
+        generated=output.read_text(encoding='utf-8')
+        actual=commands(generated)
+        assert actual[-3:]==['M400','M300 S222 P1111','M0']
+        assert actual.count('M204 P250 T800')==1
+        assert len([c for c in actual if c.startswith('M572 S')])==1
+        assert actual.index('T0') < next(i for i,c in enumerate(actual) if c.startswith('M572 S'))
+        assert 'M104 S'+cfg['temperature'] in actual
+        assert 'if !move.axes[2].homed' in actual
+        assert not any(re.match(r'M(?:140|190|203)\b',c) for c in actual)
+        assert not any(re.search(r'[{}\[\]]',c) for c in actual if c!='if !move.axes[2].homed')
+        paths,qmax=flow(generated,cfg['filament_diameter'])
+        _,bounded_flow=flow(generated,cfg['filament_diameter'],float(cfg['gcode_resolution']))
+        cap=float(cfg['filament_max_volumetric_speed'])
+        assert paths>100 and 0<bounded_flow<=cap*1.01,(name,qmax,bounded_flow,cap)
+        mesh=next(c for c in actual if c.startswith('M98 P"adaptive_mesh.g"'))
+        assert (' F40 ' in mesh)==('ULTRA' in name)
+        results.append({'printer':name,'only_compatible_filament':filament_name,
+                        'native_compatibility_query_passed':True,'extruding_paths_checked':paths,
+                        'maximum_nominal_flow_mm3_s':qmax,'flow_cap_mm3_s':cap,
+                        'flow_with_arc_resolution_allowance_mm3_s':bounded_flow,
+                        'cooling_target_s':45,'minimum_print_speed_mm_s':5})
+    return results
 
 def validate(slicer, work):
     work.mkdir(parents=True,exist_ok=True)
@@ -109,7 +177,9 @@ def validate(slicer, work):
                         'independent_profile_sliced_with_existing_printer':True,
                         'independent_profile_retains_machine_speed_limits':True,
                         'configured_volumetric_caps':caps,'gcode_sha256':hashlib.sha256(output.read_bytes()).hexdigest()})
+    starters=validate_starter(slicer,work,model)
     report={'slicer':str(slicer),'status':'Offline generated G-code checks passed',
+            'starter_presets':starters,'native_preset_load_and_compatibility_verified':True,
             'recipes':results,'physical_test':False,'printer_files_written':False,'GUI_bundle_import_verified':False}
     (work/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

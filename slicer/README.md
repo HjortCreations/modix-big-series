@@ -6,14 +6,14 @@ The printer's own preset supplies its work envelope, hardware limits and calibra
 
 ## Download and import the starter bundle
 
-**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.4/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.5/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 1. In PrusaSlicer 2.9.6, choose **File > Import > Import Config Bundle** and select the downloaded file.
 2. Select your **Hjort Creations - model - head/nozzle** printer preset.
 3. Select **Hjort Creations - BIG Starter - Layer 0.4** and a matching **Hjort Creations** filament preset.
 4. Check the selected nozzle and usable build volume, set up the physical printer/upload address locally, and slice a small test.
 
-One download imports all 15 printer presets, one shared print preset and four filament presets (three PLA, one ePETG).
+One download imports all 15 printer presets, one shared print preset and five filament presets (three PLA, two ePETG).
 There is no user build step. Existing differently named presets are retained.
 The machine needs a working config.g/homing/bed.g and the shared stop.g and adaptive_mesh.g first;
 see [macro installation and requirements](../macros/README.md). The bundle does not upload system files.
@@ -50,21 +50,27 @@ All three target 45 s minimum layer time, 5 mm/s minimum print speed, no fan for
 and full fan at layer 5. The speed floor can prevent achieving 45 s on very small layers; inspect cooling in preview.
 PLA temperatures, extrusion multiplier, PA and flow are intended to be tuned to the installed head/nozzle/material.
 
-### FormFutura ePETG - Griffin ULTRA
+### FormFutura ePETG
 
-The additional **Hjort Creations - FormFutura ePETG - Griffin ULTRA** filament preset is shared by all five ULTRA printer sizes.
-It is based on the operator's ongoing 1.8 mm ULTRA tuning; the addnorth template name in the original screenshots
+The **Hjort Creations - FormFutura ePETG - Griffin** and **Hjort Creations - FormFutura ePETG - Griffin ULTRA**
+filament presets are each shared by all five printer sizes with the matching head.
+The shared baseline comes from the operator's ongoing 1.8 mm ULTRA tuning, with explicitly requested temperature
+and flow changes for standard Griffin. The addnorth template name in the original screenshots
 does not identify the material. Brand is **FormFutura**, product **ePETG**, and material type **PETG**.
 
-- Nozzle: **245 °C** for both first and subsequent layers; bed heating remains **0 °C**.
-- Max volumetric flow: **70 mm³/s**; extrusion multiplier **1**, diameter **1.75 mm**, density **1.27 g/cm³** from the supplied baseline.
+| Head | First / normal temperature, °C | Max flow, mm³/s | Starting PA |
+|---|---|---|---|
+| Griffin | 245 / 235 | 15 | 0.015 |
+| Griffin ULTRA | 245 / 245 | 70 | 0.035 |
+
+- Bed heating remains **0 °C**; extrusion multiplier **1**, diameter **1.75 mm**, density **1.27 g/cm³** from the supplied baseline.
 - Automatic cooling and fan-always-on enabled: **30–75%** normal fan, **100%** bridge fan, fan disabled for the first **3 layers**, full-fan-layer setting **0**.
 - Retain the screenshot's **15 s** fan threshold, but use the operator-confirmed **45 s** slowdown target and **5 mm/s** speed floor instead of the template's 10 s / 15 mm/s.
-- PA **0.035** is retained as an ULTRA starting value; this is not a measured ePETG PA calibration.
+- PA uses each head's starting value; neither value is a measured ePETG PA calibration.
 
 The template's 29.99 material cost is not a verified FormFutura price, so cost is left at zero for local entry.
 This is a working starting profile, not a completed material/nozzle validation. Confirm flow on other nozzles.
-Dependencies make it compatible with ULTRA only, alongside ULTRA PLA; it is not offered for standard Griffin or High-Flow.
+Dependencies offer each ePETG preset alongside PLA only for its matching head. High-Flow has no ePETG preset yet.
 
 The shared process uses automatic widths (all width fields zero), 0.4 mm layers/first layer, two walls,
 15% adaptive cubic infill and the existing shared start/end sequence. Infill combination is disabled for this baseline.

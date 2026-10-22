@@ -1,0 +1,10 @@
+{
+  "name": "Hjort Creations - FormFutura ePETG - Griffin",
+  "base": "formfutura-epetg-ultra",
+  "pressure_advance": 0.015,
+  "status": "Operator-requested FormFutura ePETG starting profile for standard Griffin: 245 C first layer, 235 C subsequent layers and 15 mm3/s maximum flow. Cooling and other material settings follow the shared ePETG baseline. Pressure advance uses the standard Griffin starting value, not a measured PETG calibration. Verify on the installed nozzle; repository checks are not a physical print test.",
+  "settings": {
+    "temperature": "235",
+    "filament_max_volumetric_speed": "15"
+  }
+}

@@ -82,6 +82,8 @@ def validate_starter(slicer, work, model):
         expected=[default_filament]
         if 'ULTRA' in name:
             expected.append('Hjort Creations - FormFutura ePETG - Griffin ULTRA')
+        elif 'High-Flow' not in name:
+            expected.append('Hjort Creations - FormFutura ePETG - Griffin')
         assert sorted(listed[0]['user_filament_profiles'])==sorted(expected),compatible
         for material_index,filament_name in enumerate(expected):
             output=folder/f'{index:02d}-{material_index}.gcode'
@@ -98,8 +100,10 @@ def validate_starter(slicer, work, model):
             assert cfg['slowdown_below_layer_time']=='45' and cfg['min_print_speed']=='5'
             assert cfg['automatic_extrusion_widths']=='1' and cfg['layer_height']=='0.4'
             if 'ePETG' in filament_name:
+                ultra='ULTRA' in filament_name
                 expected_petg={'filament_vendor':'FormFutura','filament_type':'PETG','filament_density':'1.27',
-                               'temperature':'245','first_layer_temperature':'245','filament_max_volumetric_speed':'70',
+                               'temperature':'245' if ultra else '235','first_layer_temperature':'245',
+                               'filament_max_volumetric_speed':'70' if ultra else '15',
                                'min_fan_speed':'30','max_fan_speed':'75','bridge_fan_speed':'100',
                                'disable_fan_first_layers':'3','full_fan_speed_layer':'0','fan_below_layer_time':'15'}
                 assert all(cfg[key].strip('"')==value for key,value in expected_petg.items())
@@ -108,6 +112,8 @@ def validate_starter(slicer, work, model):
             assert actual[-3:]==['M400','M300 S222 P1111','M0']
             assert actual.count('M204 P250 T800')==1
             assert len([c for c in actual if c.startswith('M572 S')])==1
+            if 'ePETG' in filament_name:
+                assert ('M572 S0.035' if ultra else 'M572 S0.015') in actual
             assert actual.index('T0') < next(i for i,c in enumerate(actual) if c.startswith('M572 S'))
             assert 'M104 S'+cfg['temperature'] in actual
             assert 'if !move.axes[2].homed' in actual

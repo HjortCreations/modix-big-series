@@ -7,7 +7,8 @@
     {"toolhead": "ultra-1.4", "material": "pla-starter-ultra", "label": "ULTRA 1.4"}
   ],
   "additional_materials": [
-    {"material": "formfutura-epetg-ultra", "toolhead": "ultra-1.4"}
+    {"material": "formfutura-epetg-ultra", "toolhead": "ultra-1.4"},
+    {"material": "formfutura-epetg-griffin", "toolhead": "griffin-0.8"}
   ],
   "default_model": "big-60"
 }

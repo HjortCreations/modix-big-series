@@ -191,14 +191,14 @@ def starter_checks():
     printers={name:value for name,value in groups.items() if name.startswith('printer:')}
     filaments={name:value for name,value in groups.items() if name.startswith('filament:')}
     processes=[value for name,value in groups.items() if name.startswith('print:')]
-    assert len(processes)==1 and len(filaments)==4
+    assert len(processes)==1 and len(filaments)==5
     enabled=[m for m in read('slicer/machines.json')['models'].values() if m.get('starter_enabled',True)]
     assert len(printers)==len(enabled)*3
     process=processes[0]
     assert process['automatic_extrusion_widths']=='1'
     assert all(v=='0' for k,v in process.items() if k.endswith(('_extrusion_width','_acceleration')))
     assert process['max_volumetric_speed']=='0'
-    assert sorted(float(v['filament_max_volumetric_speed']) for v in filaments.values())==[25,40,70,80]
+    assert sorted(float(v['filament_max_volumetric_speed']) for v in filaments.values())==[15,25,40,70,80]
     for value in filaments.values():
         assert value['slowdown_below_layer_time']=='45' and value['min_print_speed']=='5'
         assert value['bed_temperature']==value['first_layer_bed_temperature']=='0'

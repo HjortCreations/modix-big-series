@@ -5,7 +5,7 @@ Choose the feature you need. A machine example's name does not limit a shared fe
 
 ## Get started in PrusaSlicer
 
-**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.4/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.5/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 Import the file with **File > Import > Import Config Bundle**. Select your printer/head,
 the **Hjort Creations - BIG Starter - Layer 0.4** print profile and a matching filament profile.
@@ -15,6 +15,7 @@ No scripts or building are needed. The file contains:
 - One shared print profile with automatic line widths, 0.4 mm layers and first layer, and 250/800 mm/s² print/travel acceleration in start G-code.
 - Three generic PLA starting profiles: Griffin **25**, High-Flow **40** and ULTRA **80 mm³/s**. Each targets **45 s** minimum layer time with a 5 mm/s minimum print speed.
 - **FormFutura ePETG for ULTRA:** 245 °C, **70 mm³/s**, 30–75% fan, 100% bridge fan and the same 45 s / 5 mm/s cooling limits. The fan is off for the first three layers.
+- **FormFutura ePETG for standard Griffin:** **245 °C first layer / 235 °C normal layers**, **15 mm³/s**, with the same ePETG fan and cooling settings. Dependencies select the matching head across machine sizes.
 - Dependencies matching each filament profile to its head across machine sizes. Incompatible selections can still be overridden manually.
 
 The machine must already have the shared stop.g and adaptive_mesh.g installed and a working bed.g.

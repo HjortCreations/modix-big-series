@@ -33,7 +33,7 @@ all 15 model/head combinations, and native compatibility queries must return onl
 Checks cover the 45 s cooling target, 5 mm/s speed floor, flow caps, nozzle/build dimensions, inherited settings,
 shared start/end commands, selected-filament PA and retention of firmware axis limits.
 Very short fitted arcs retain extrusion from their original polylines; flow checks allow the configured
-0.0125 mm geometric resolution on arcs and report both raw and resolution-adjusted nominal flow.
+0.05 mm geometric resolution on arcs and report both raw and resolution-adjusted nominal flow.
 GUI Config Bundle import remains a separate check; native loading/compatibility/slicing is not a physical print test.
 Reports are saved in the work directory rather than as additional dated repository documents.
 Record physical tests, motor noise, temperature margins and print quality in private service records.

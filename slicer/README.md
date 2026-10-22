@@ -6,7 +6,7 @@ The printer's own preset supplies its work envelope, hardware limits and calibra
 
 ## Download and import the starter bundle
 
-**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.2/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.3/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 1. In PrusaSlicer 2.9.6, choose **File > Import > Import Config Bundle** and select the downloaded file.
 2. Select your **Hjort Creations - model - head/nozzle** printer preset.
@@ -53,6 +53,8 @@ PLA temperatures, extrusion multiplier, PA and flow are intended to be tuned to 
 The shared process uses automatic widths (all width fields zero), 0.4 mm layers/first layer, two walls,
 15% adaptive cubic infill and the existing shared start/end sequence. Infill combination is disabled for this baseline.
 Print/travel acceleration stays 250/800; feature acceleration overrides stay zero.
+Shared print defaults use 10% infill/perimeter overlap, a 0.95 bridge flow ratio and 0.05 mm G-code resolution
+with G2/G3 I/J arc fitting enabled. These defaults also apply to the independent and example profiles.
 Axis speed limits remain in the printer firmware. Slicer machine limits are used only for time estimation.
 The selected PLA preset supplies PA in its filament start G-code, after the shared printer startup.
 Build-plate heat is disabled. Filament dependencies match head identifiers in printer notes, never a customer or model name.

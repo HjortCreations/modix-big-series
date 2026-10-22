@@ -5,7 +5,7 @@ Choose the feature you need. A machine example's name does not limit a shared fe
 
 ## Get started in PrusaSlicer
 
-**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.2/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.3/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 Import the file with **File > Import > Import Config Bundle**. Select your printer/head,
 the **Hjort Creations - BIG Starter - Layer 0.4** print profile and the matching PLA profile.
@@ -56,7 +56,7 @@ The profile packages contain print/material presets, shared start/end snippets a
 The current ULTRA 1.8 mm/ePLA defaults are 100 mm³/s, 235/215 °C, PA 0.035,
 print/travel acceleration 250/800 mm/s², 1.0 mm layers and a 1.2 mm first layer.
 These are working defaults for that head/nozzle/material, independent of bed size, not a measured maximum throughput.
-G-code resolution remains 0.0125 mm; the proposed 0.05 mm change has not been applied automatically.
+Shared print defaults use 10% infill/perimeter overlap, a 0.95 bridge flow ratio and 0.05 mm G-code resolution with arc fitting enabled.
 
 ## Machine configuration and optional examples
 

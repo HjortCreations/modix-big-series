@@ -29,9 +29,11 @@ This loads the generated complete INI, slices a locally generated model and chec
 start/end commands, conditional homing, heater temperature changes, acceleration commands and flow limits.
 Bundle sections are also checked for matching settings and preset identities.
 The all-in-one starter is parsed into an isolated PrusaSlicer data directory. The native preset loader slices
-all 15 model/head combinations, and native compatibility queries must return only the matching PLA preset.
+all 15 model/head combinations. Native compatibility queries return one PLA choice for standard Griffin/High-Flow,
+and PLA plus FormFutura ePETG for ULTRA. All 20 allowed model/head/material combinations are sliced.
 Checks cover the 45 s cooling target, 5 mm/s speed floor, flow caps, nozzle/build dimensions, inherited settings,
 shared start/end commands, selected-filament PA and retention of firmware axis limits.
+The ePETG slices also verify FormFutura/PETG identity, 245 °C, 70 mm3/s, density and the requested fan settings.
 Very short fitted arcs retain extrusion from their original polylines; flow checks allow the configured
 0.05 mm geometric resolution on arcs and report both raw and resolution-adjusted nominal flow.
 GUI Config Bundle import remains a separate check; native loading/compatibility/slicing is not a physical print test.

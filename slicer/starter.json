@@ -6,5 +6,8 @@
     {"toolhead": "griffin-high-flow-0.8", "material": "pla-starter-griffin-high-flow", "label": "Griffin High-Flow 0.8"},
     {"toolhead": "ultra-1.4", "material": "pla-starter-ultra", "label": "ULTRA 1.4"}
   ],
+  "additional_materials": [
+    {"material": "formfutura-epetg-ultra", "toolhead": "ultra-1.4"}
+  ],
   "default_model": "big-60"
 }

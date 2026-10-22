@@ -69,9 +69,7 @@ def validate_starter(slicer, work, model):
     for index,section in enumerate(s for s in bundle.sections() if s.startswith('printer:')):
         name=section.split(':',1)[1]
         printer=bundle[section]
-        filament_name=printer['default_filament_profile'].strip('"')
-        output=folder/f'{index:02d}.gcode'
-        normalized=folder/f'{index:02d}.ini'
+        default_filament=printer['default_filament_profile'].strip('"')
         query=folder/f'{index:02d}-compatible.json'
         # In 2.9.6 a successful query writes JSON but exits with status 1.
         result=subprocess.run([str(slicer),'--datadir',str(data),'--printer-profile',name,
@@ -81,39 +79,51 @@ def validate_starter(slicer, work, model):
         assert compatible['printer_profile']==name
         listed=compatible['user_print_profiles']
         assert len(listed)==1 and listed[0]['name']==printer['default_print_profile']
-        assert listed[0]['user_filament_profiles']==[filament_name],compatible
-        subprocess.run([str(slicer),'--datadir',str(data),'--printer-profile',name,
-                        '--print-profile',printer['default_print_profile'],'--material-profile',filament_name,
-                        '--save',str(normalized),'--export-gcode','--center','300,300',
-                        '--output',str(output),str(model)],check=True)
-        parser=configparser.ConfigParser(interpolation=None)
-        parser.read_string('[config]\n'+normalized.read_text(encoding='utf-8-sig'))
-        cfg=parser['config']
-        assert cfg['bed_shape']==printer['bed_shape'] and cfg['nozzle_diameter']==printer['nozzle_diameter']
-        assert cfg['max_print_height']==printer['max_print_height']
-        assert cfg['slowdown_below_layer_time']=='45' and cfg['min_print_speed']=='5'
-        assert cfg['automatic_extrusion_widths']=='1' and cfg['layer_height']=='0.4'
-        generated=output.read_text(encoding='utf-8')
-        actual=commands(generated)
-        assert actual[-3:]==['M400','M300 S222 P1111','M0']
-        assert actual.count('M204 P250 T800')==1
-        assert len([c for c in actual if c.startswith('M572 S')])==1
-        assert actual.index('T0') < next(i for i,c in enumerate(actual) if c.startswith('M572 S'))
-        assert 'M104 S'+cfg['temperature'] in actual
-        assert 'if !move.axes[2].homed' in actual
-        assert not any(re.match(r'M(?:140|190|203)\b',c) for c in actual)
-        assert not any(re.search(r'[{}\[\]]',c) for c in actual if c!='if !move.axes[2].homed')
-        paths,qmax=flow(generated,cfg['filament_diameter'])
-        _,bounded_flow=flow(generated,cfg['filament_diameter'],float(cfg['gcode_resolution']))
-        cap=float(cfg['filament_max_volumetric_speed'])
-        assert paths>100 and 0<bounded_flow<=cap*1.01,(name,qmax,bounded_flow,cap)
-        mesh=next(c for c in actual if c.startswith('M98 P"adaptive_mesh.g"'))
-        assert (' F40 ' in mesh)==('ULTRA' in name)
-        results.append({'printer':name,'only_compatible_filament':filament_name,
-                        'native_compatibility_query_passed':True,'extruding_paths_checked':paths,
-                        'maximum_nominal_flow_mm3_s':qmax,'flow_cap_mm3_s':cap,
-                        'flow_with_arc_resolution_allowance_mm3_s':bounded_flow,
-                        'cooling_target_s':45,'minimum_print_speed_mm_s':5})
+        expected=[default_filament]
+        if 'ULTRA' in name:
+            expected.append('Hjort Creations - FormFutura ePETG - Griffin ULTRA')
+        assert sorted(listed[0]['user_filament_profiles'])==sorted(expected),compatible
+        for material_index,filament_name in enumerate(expected):
+            output=folder/f'{index:02d}-{material_index}.gcode'
+            normalized=folder/f'{index:02d}-{material_index}.ini'
+            subprocess.run([str(slicer),'--datadir',str(data),'--printer-profile',name,
+                            '--print-profile',printer['default_print_profile'],'--material-profile',filament_name,
+                            '--save',str(normalized),'--export-gcode','--center','300,300',
+                            '--output',str(output),str(model)],check=True)
+            parser=configparser.ConfigParser(interpolation=None)
+            parser.read_string('[config]\n'+normalized.read_text(encoding='utf-8-sig'))
+            cfg=parser['config']
+            assert cfg['bed_shape']==printer['bed_shape'] and cfg['nozzle_diameter']==printer['nozzle_diameter']
+            assert cfg['max_print_height']==printer['max_print_height']
+            assert cfg['slowdown_below_layer_time']=='45' and cfg['min_print_speed']=='5'
+            assert cfg['automatic_extrusion_widths']=='1' and cfg['layer_height']=='0.4'
+            if 'ePETG' in filament_name:
+                expected_petg={'filament_vendor':'FormFutura','filament_type':'PETG','filament_density':'1.27',
+                               'temperature':'245','first_layer_temperature':'245','filament_max_volumetric_speed':'70',
+                               'min_fan_speed':'30','max_fan_speed':'75','bridge_fan_speed':'100',
+                               'disable_fan_first_layers':'3','full_fan_speed_layer':'0','fan_below_layer_time':'15'}
+                assert all(cfg[key].strip('"')==value for key,value in expected_petg.items())
+            generated=output.read_text(encoding='utf-8')
+            actual=commands(generated)
+            assert actual[-3:]==['M400','M300 S222 P1111','M0']
+            assert actual.count('M204 P250 T800')==1
+            assert len([c for c in actual if c.startswith('M572 S')])==1
+            assert actual.index('T0') < next(i for i,c in enumerate(actual) if c.startswith('M572 S'))
+            assert 'M104 S'+cfg['temperature'] in actual
+            assert 'if !move.axes[2].homed' in actual
+            assert not any(re.match(r'M(?:140|190|203)\b',c) for c in actual)
+            assert not any(re.search(r'[{}\[\]]',c) for c in actual if c!='if !move.axes[2].homed')
+            paths,qmax=flow(generated,cfg['filament_diameter'])
+            _,bounded_flow=flow(generated,cfg['filament_diameter'],float(cfg['gcode_resolution']))
+            cap=float(cfg['filament_max_volumetric_speed'])
+            assert paths>100 and 0<bounded_flow<=cap*1.01,(name,qmax,bounded_flow,cap)
+            mesh=next(c for c in actual if c.startswith('M98 P"adaptive_mesh.g"'))
+            assert (' F40 ' in mesh)==('ULTRA' in name)
+            results.append({'printer':name,'selected_filament':filament_name,'compatible_filaments':expected,
+                            'native_compatibility_query_passed':True,'extruding_paths_checked':paths,
+                            'maximum_nominal_flow_mm3_s':qmax,'flow_cap_mm3_s':cap,
+                            'flow_with_arc_resolution_allowance_mm3_s':bounded_flow,
+                            'cooling_target_s':45,'minimum_print_speed_mm_s':5})
     return results
 
 def validate(slicer, work):

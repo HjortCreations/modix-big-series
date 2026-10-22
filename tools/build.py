@@ -88,6 +88,15 @@ def macro_files():
     files['README.md'] = text('macros/README.md').encode()
     return files
 
+def starter_filament(material, head, head_id):
+    """Share material values across all printer models with this head."""
+    filament = {**read('slicer/common/filament.json'), **material['settings']}
+    filament.update(filament_settings_id=json.dumps(material['name']),
+                    compatible_printers_condition=f'printer_notes=~/.*HC_PROFILE_FAMILY=MODIX_BIG;.*/ and printer_notes=~/.*HC_TOOLHEAD={head_id};.*/',
+                    start_filament_gcode=json.dumps(f'M572 S{material["pressure_advance"]} ; Basic start value for the {head["name"]} toolhead'),
+                    filament_notes=json.dumps('Starting values for tuning; 45 s cooling target can be limited by the minimum print speed. '+material.get('status','')))
+    return filament
+
 def starter_groups():
     """Ready-to-import presets; machine dimensions never select material/process values."""
     selection = read('slicer/starter.json')
@@ -107,12 +116,7 @@ def starter_groups():
         head = component('config/toolheads', tool['head'])
         material = component('slicer/materials', variant['material'])
         filament_name = material['name']
-        filament = {**read('slicer/common/filament.json'), **material['settings']}
-        filament.update(filament_settings_id=json.dumps(filament_name),
-                        compatible_printers_condition=f'printer_notes=~/.*HC_PROFILE_FAMILY=MODIX_BIG;.*/ and printer_notes=~/.*HC_TOOLHEAD={tool["head"]};.*/',
-                        start_filament_gcode=json.dumps(f'M572 S{material["pressure_advance"]} ; Basic start value for the {head["name"]} toolhead'),
-                        filament_notes=json.dumps('Starting values for tuning; 45 s cooling target can be limited by the minimum print speed.'))
-        groups['filament:'+filament_name] = filament
+        groups['filament:'+filament_name] = starter_filament(material,head,tool['head'])
         for ident,machine in machines.items():
             if not machine.get('starter_enabled', True):
                 continue
@@ -132,6 +136,11 @@ def starter_groups():
                            before_layer_gcode=text('slicer/gcode/before-layer.gcode').rstrip().replace('\n', r'\n'),
                            host_type='duet', print_host='', printhost_apikey='')
             groups['printer:'+name] = printer
+    for extra in selection.get('additional_materials', []):
+        tool = component('slicer/toolheads',extra['toolhead'])
+        head = component('config/toolheads',tool['head'])
+        material = component('slicer/materials',extra['material'])
+        groups['filament:'+material['name']] = starter_filament(material,head,tool['head'])
     default_model = machines[selection['default_model']]['name']
     groups['presets'] = {'print':print_name, 'filament':component('slicer/materials',selection['variants'][0]['material'])['name'],
                          'printer':'Hjort Creations - '+default_model+' - '+selection['variants'][0]['label']}

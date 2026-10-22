@@ -18,7 +18,7 @@ No scripts or building are needed. The file contains:
 - **FormFutura ePETG for standard Griffin:** **245 °C first layer / 235 °C normal layers**, **15 mm³/s**, with the same ePETG fan and cooling settings. Dependencies select the matching head across machine sizes.
 - Dependencies matching each filament profile to its head across machine sizes. Incompatible selections can still be overridden manually.
 
-The machine must already have the shared stop.g and adaptive_mesh.g installed and a working bed.g.
+The machine must already have the shared stop.g, cancel.g and adaptive_mesh.g installed and a working bed.g.
 This slicer file does not install firmware or change the machine's own axis speed limits.
 [Setup, dimensions and starting-value notes](slicer/README.md)
 
@@ -27,6 +27,7 @@ This slicer file does not install firmware or change the machine's own axis spee
 | Feature | Open the file | Purpose |
 |---|---|---|
 | Shared print end | **[stop.g](macros/stop.g)** | Guard warm retraction, lower the bed within Z limits, park X1 Y1 and keep Z holding |
+| Cancel a print | **[cancel.g](macros/cancel.g)** | Route cancellation through the same stop.g; retain Z holding for the next print |
 | Adaptive mesh | **[adaptive_mesh.g](macros/adaptive_mesh.g)** | Probe around this print using configured travel, probe offsets and head clearance |
 | Adaptive U-tilt | [g32_u.g](macros/g32_u.g) | Align a four-motor bed using alternating U paths and adaptive probe depth |
 | Cold movement test | [axis_test.g](macros/axis_test.g) | Test configured XYZ motion without heating or extrusion |

@@ -15,7 +15,7 @@ The printer's own preset supplies its work envelope, hardware limits and calibra
 
 One download imports all 15 printer presets, one shared print preset and five filament presets (three PLA, two ePETG).
 There is no user build step. Existing differently named presets are retained.
-The machine needs a working config.g/homing/bed.g and the shared stop.g and adaptive_mesh.g first;
+The machine needs a working config.g/homing/bed.g and the shared stop.g, cancel.g and adaptive_mesh.g first;
 see [macro installation and requirements](../macros/README.md). The bundle does not upload system files.
 Keep an already commissioned bed.g; the optional shared U-tilt has its own four-Z-motor requirements.
 

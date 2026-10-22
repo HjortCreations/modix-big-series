@@ -81,7 +81,7 @@ def profile_files(selection):
             'README.md':text('slicer/README.md').encode()}
 
 def macro_files():
-    files = {name:text('macros/'+name).encode() for name in ['stop.g','adaptive_mesh.g','g32_u.g','axis_test.g']}
+    files = {name:text('macros/'+name).encode() for name in ['stop.g','cancel.g','adaptive_mesh.g','g32_u.g','axis_test.g']}
     for ident in ['griffin','griffin-high-flow','griffin-ultra']:
         head = component('config/toolheads',ident)
         files['bed-'+ident+'.g'] = bed_wrapper(head,head['nozzle_insets_mm'])
@@ -196,7 +196,7 @@ def compose(recipe):
         if key.endswith('_acceleration'):
             groups['print'][key] = '0'
     flat = {k: v for group in groups.values() for k, v in group.items()}
-    files = {'sys/' + name: text('macros/' + name).encode() for name in ['stop.g', 'g32_u.g', 'axis_test.g']}
+    files = {'sys/' + name: text('macros/' + name).encode() for name in ['stop.g', 'cancel.g', 'g32_u.g', 'axis_test.g']}
     files['sys/bed.g'] = bed_wrapper(head,[left,front,right,rear])
     files['sys/adaptive_mesh.g'] = text('macros/adaptive_mesh.g').encode()
     for name in ['homeall.g', 'homez.g', 'homex.g', 'homey.g']:
@@ -265,7 +265,7 @@ def main():
         print('Built '+destination.name)
     if args.all or args.macros:
         archive('shared-macros',macro_files())
-        for name in ['stop.g','adaptive_mesh.g']:
+        for name in ['stop.g','cancel.g','adaptive_mesh.g']:
             (ROOT/'dist'/name).write_bytes((ROOT/'macros'/name).read_bytes())
     if args.all or args.profiles:
         for ident,selection in read('slicer/profiles.json').items():

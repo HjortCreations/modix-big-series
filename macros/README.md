@@ -7,6 +7,7 @@ Compatibility is defined by the firmware, configured axes, probe and tool mappin
 | Feature | Direct source | What it adds |
 |---|---|---|
 | Print-end routine | [stop.g](stop.g) | Warm-tool retraction guard, bounded bed lowering, X1 Y1 parking and retained Z holding |
+| Cancel entry point | [cancel.g](cancel.g) | Reuse stop.g after cancellation; keep Z enabled for the next print |
 | Adaptive mesh | [adaptive_mesh.g](adaptive_mesh.g) | A probing grid around the print, calculated from configured travel and probe offsets |
 | Adaptive U-tilt | [g32_u.g](g32_u.g) | Alternating U-shaped passes, adaptive probe depth and conditional reuse of successful alignment |
 | Cold axis test | [axis_test.g](axis_test.g) | Exercises most of XY and a short Z stroke using configured limits |
@@ -28,6 +29,15 @@ and part cooling, lowers the bed towards at least Z300 with 5 mm clearance where
 parks at machine X1 Y1 when XY is homed, and releases XY/extruders while keeping Z enabled.
 It never lowers the bed beyond configured Z-max or raises it to reach Z300.
 Retained Z holding depends on the machine's configured idle current supporting the bed.
+
+Install **cancel.g alongside stop.g**, including when updating an older package. On RRF 3.5+, cancelling a paused job
+runs cancel.g when present, so an old vendor cancel.g containing bare M84 bypasses the shared stop routine and disables Z.
+The shared cancel.g calls stop.g and then clears the cancelled job's babystepping; it has no separate parking or motor-release logic.
+Successful cancellation retains Z homing and the cached bed alignment when Z has remained enabled.
+The next start can home XY and reuse valid alignment. If Z was already released, its position is unknown;
+normal full homing/alignment is required rather than marking it homed artificially.
+`M98 P"cancel.g" D1` forwards to the stop plan without motion or babystep changes.
+Physical cancellation and restart still need observation on the installed machine.
 
 Use the same slicer end sequence regardless of model or nozzle:
 

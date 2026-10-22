@@ -5,6 +5,7 @@ Change each setting in one place. Shared macros and independent slicer profiles 
 | Change | Source |
 |---|---|
 | Shared print-end behaviour | macros/stop.g |
+| Cancel entry point (delegates to stop.g) | macros/cancel.g |
 | Shared start/end sequence | slicer/gcode/ |
 | Work envelope or Z-screw geometry | config/models/ |
 | Travel limits for an individual machine | A local recipe outside Git, using axis_max |

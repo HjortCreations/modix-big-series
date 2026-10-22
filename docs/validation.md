@@ -17,6 +17,9 @@ The tools in this repository do not operate a printer.
 python tools/check.py verifies that shared macros and print/material profiles build without reading any model, hardware or motion recipe. It also checks byte-identical stop.g and adaptive_mesh.g across example packages, composition, shared sources, privacy,
 U-tilt geometry across probe offsets and axis limits, positive and bounded Z parking,
 warm-tool retraction, cache conditions, and reuse of ULTRA process/material settings across machine sizes.
+Cancellation routing is checked for normal and D1 calls, with no independent motor-disable or homing commands;
+the same cancel.g is included in the shared macro package and all example overlays.
+These checks do not simulate the firmware scheduler or establish a physical cancel/reprint test.
 GitHub Actions runs the same checks and builds the packages.
 
 Run actual slicer validation with PrusaSlicer 2.9.6:

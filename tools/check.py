@@ -30,8 +30,9 @@ def composition():
         recipe = json.loads(path.read_text())
         files, groups = compose(recipe)
         assert 'sys/config.g' not in files
-        assert len([k for k in files if k.startswith('sys/')]) == 9
+        assert len([k for k in files if k.startswith('sys/')]) == 10
         assert files['sys/stop.g'] == (ROOT/'macros/stop.g').read_bytes()
+        assert files['sys/cancel.g'] == (ROOT/'macros/cancel.g').read_bytes()
         assert files['sys/g32_u.g'] == (ROOT/'macros/g32_u.g').read_bytes()
         assert files['sys/adaptive_mesh.g'] == (ROOT/'macros/adaptive_mesh.g').read_bytes()
         assert all(not re.search(rb'@[A-Z_]+@', data) for data in files.values())
@@ -106,6 +107,25 @@ def geometry():
 
 def stop_checks():
     stop=text('macros/stop.g')
+    cancel=text('macros/cancel.g')
+    # Exercise both cancellation routes; D1 must not reach babystep cleanup.
+    translated=['def run(present,value):','    calls=[]']
+    for line in cancel.splitlines():
+        command=line.split(';',1)[0].strip()
+        if not command:continue
+        indent=line[:len(line)-len(line.lstrip())]
+        if command=='if exists(param.D)':statement='if present:'
+        elif command=='if param.D = 1':statement='if value == 1:'
+        elif command=='M99':statement='return calls'
+        else:statement='calls.append('+repr(command)+')'
+        translated.append('    '+indent+statement)
+    translated.append('    return calls')
+    scope={}
+    exec(compile('\n'.join(translated),'actual cancellation route','exec'),scope)
+    for present,value in [(False,0),(True,0),(True,1)]:
+        assert scope['run'](present,value)==(['M98 P"stop.g" D1'] if present and value==1 else ['M98 P"stop.g"','M290 R0 S0'])
+    assert not re.search(r'^\s*(?:M(?:18|84|17)|G28)\b',cancel,re.M)
+    assert re.findall(r'^\s*M84\b[^;\n]*',stop,re.M)==['M84 X Y E0:1 ']
     e=re.findall(r'^\s*set var.parkDeltaZ = (max\(.+)$',stop,re.M)[-1]
     count=0
     for maximum in [250,1000,1200]:
@@ -169,6 +189,7 @@ def independence():
     try:
         macros=macro_files()
         assert macros['stop.g']==(ROOT/'macros/stop.g').read_bytes()
+        assert macros['cancel.g']==(ROOT/'macros/cancel.g').read_bytes()
         assert macros['adaptive_mesh.g']==(ROOT/'macros/adaptive_mesh.g').read_bytes()
         for selection in selections.values():
             files=profile_files(selection)

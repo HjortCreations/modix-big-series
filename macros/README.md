@@ -12,6 +12,11 @@ Compatibility is defined by the firmware, configured axes, probe and tool mappin
 | Adaptive U-tilt | [g32_u.g](g32_u.g) | Alternating U-shaped passes, adaptive probe depth and conditional reuse of successful alignment |
 | Cold axis test | [axis_test.g](axis_test.g) | Exercises most of XY and a short Z stroke using configured limits |
 
+Hjort Creations' original contributions are provided under the [Own-Printer Use License](../LICENSE.md).
+Use on your own printers, including business use and paid printing, is permitted.
+Commercial redistribution requires separate permission. Earlier and third-party rights remain unchanged;
+see [third-party notices](../THIRD_PARTY_NOTICES.md). Both notices accompany the shared-macros ZIP.
+
 Ready-to-copy files and the shared-macros ZIP are available under
 [Releases](https://github.com/HjortCreations/modix-big-series/releases).
 Copy the selected files to the printer's existing sys/ directory after backing up the originals.

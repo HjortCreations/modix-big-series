@@ -11,7 +11,7 @@ for individuals, companies and organisations. [See how we can help](#setup-servi
 
 ## Get started in PrusaSlicer
 
-**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.6/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.7/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 Import the file with **File > Import > Import Config Bundle**. Select your printer/head,
 the **Hjort Creations - BIG Starter - Layer 0.4** print profile and a matching filament profile.
@@ -75,6 +75,25 @@ Individual calibration and network settings stay outside this repository.
 [Machine combination examples](recipes/README.md) assemble the independent components with particular geometry and homing references.
 The example ZIPs are convenient complete combinations. **They are not a list of the models that can use the shared macros or slicer profiles.**
 Their newly assembled files have not been physically commissioned as complete packages.
+
+## Feedback and bug reports
+
+[Report a problem](https://github.com/HjortCreations/modix-big-series/issues/new/choose)
+with the downloaded version, printer/controller/firmware, printhead/nozzle and what happened.
+The form asks for the relevant details; remove private information before attaching files.
+Suggestions are welcome through a regular issue. Individual printer setup and tuning can be arranged below.
+
+## License and permitted use
+
+Hjort Creations' original contributions use the [Own-Printer Use License](LICENSE.md).
+Use and adapt them on your own printers, including for business and paid printing.
+Commercial redistribution, resale or bundling requires separate written permission.
+Noncommercial sharing must retain the license, attribution and notices.
+This is a source-available project with commercial redistribution restrictions.
+
+**Earlier CC0 permissions and third-party rights remain unchanged.**
+[Third-party notices](THIRD_PARTY_NOTICES.md) identify the Modix-derived homing references,
+whose upstream redistribution permission remains unresolved. The new license does not grant rights in those portions.
 
 ## Setup, service and tuning
 

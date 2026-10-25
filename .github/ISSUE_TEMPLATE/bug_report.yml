@@ -1,0 +1,67 @@
+name: Bug report
+description: Report a problem with a profile, macro, build or instruction.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the Modix BIG-series profiles and macros.
+        Describe an observed problem; you do not need to repeat unsafe printer movements.
+        Reports are public. Remove passwords, network addresses, customer details and private model files from attachments.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part is affected?
+      options:
+        - PrusaSlicer profile or import
+        - Start or end of a print
+        - Cancelling a print
+        - Adaptive mesh or U-tilt
+        - Build tools or documentation
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Release or commit
+      description: Include the downloaded filename and any local changes. Write unknown if needed.
+      placeholder: "v0.3.6, shared-macros.zip; stop.g unchanged"
+    validations:
+      required: true
+  - type: textarea
+    id: machine
+    attributes:
+      label: Printer setup
+      description: Give the model, generation, controller, firmware version, printhead and nozzle. Add probe type and number of independently driven Z motors for probing issues. Write N/A for a documentation-only report.
+      placeholder: |
+        Model / generation:
+        Controller / RepRapFirmware version:
+        Printhead / nozzle diameter:
+        Probe / independently driven Z motors, if relevant:
+    validations:
+      required: true
+  - type: input
+    id: slicer
+    attributes:
+      label: Slicer, presets and material, if relevant
+      placeholder: "PrusaSlicer version; printer / print / filament preset; material"
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: What did you do?
+      description: Give the steps or commands that led to the problem, including any edited settings or macros.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result
+      description: Describe what you expected, what happened, and any exact error message.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant evidence, if available
+      description: Add a screenshot, short video, console output or the smallest relevant G-code excerpt. Attach only files you are allowed to share publicly.

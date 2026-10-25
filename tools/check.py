@@ -35,6 +35,8 @@ def composition():
         assert files['sys/cancel.g'] == (ROOT/'macros/cancel.g').read_bytes()
         assert files['sys/g32_u.g'] == (ROOT/'macros/g32_u.g').read_bytes()
         assert files['sys/adaptive_mesh.g'] == (ROOT/'macros/adaptive_mesh.g').read_bytes()
+        for notice in ['LICENSE.md','THIRD_PARTY_NOTICES.md']:
+            assert files[notice] == (ROOT/notice).read_bytes()
         assert all(not re.search(rb'@[A-Z_]+@', data) for data in files.values())
         manifest = json.loads(files['manifest.json'])
         assert all(hashlib.sha256(files[k]).hexdigest()==sha for k,sha in manifest['files'].items())
@@ -191,8 +193,12 @@ def independence():
         assert macros['stop.g']==(ROOT/'macros/stop.g').read_bytes()
         assert macros['cancel.g']==(ROOT/'macros/cancel.g').read_bytes()
         assert macros['adaptive_mesh.g']==(ROOT/'macros/adaptive_mesh.g').read_bytes()
+        for notice in ['LICENSE.md','THIRD_PARTY_NOTICES.md']:
+            assert macros[notice] == (ROOT/notice).read_bytes()
         for selection in selections.values():
             files=profile_files(selection)
+            for notice in ['LICENSE.md','THIRD_PARTY_NOTICES.md']:
+                assert files[notice] == (ROOT/notice).read_bytes()
             assert not any(k.startswith(('sys/','reference/')) for k in files)
             bundle=configparser.ConfigParser(interpolation=None)
             bundle.read_string(files['PrusaSlicer-process-material.ini'].decode())

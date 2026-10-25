@@ -25,6 +25,9 @@ def component(group, ident, ancestors=()):
 def text(path):
     return (ROOT / path).read_text(encoding='utf-8-sig')
 
+def licensing_files():
+    return {name:text(name).encode('utf-8') for name in ['LICENSE.md','THIRD_PARTY_NOTICES.md']}
+
 def template(path, substitutions=None):
     value = text(path)
     for key, replacement in (substitutions or {}).items():
@@ -71,21 +74,22 @@ def profile_files(selection):
     for group,settings in groups.items():
         name = 'BIG '+(process if group=='print' else material)['name']
         bundle += '\n['+group+':'+name+']\n'+''.join(f'{k} = {v}\n' for k,v in sorted(settings.items()))
-    return {'PrusaSlicer-process-material.ini':bundle.encode(),
+    return {**licensing_files(), 'PrusaSlicer-process-material.ini':bundle.encode(),
             'gcode/start.gcode':start_code(process,material,head).encode(),
             'gcode/end.gcode':text('slicer/gcode/end.gcode').encode(),
             'gcode/before-layer.gcode':text('slicer/gcode/before-layer.gcode').encode(),
             'toolhead-settings-reference.json':(json.dumps({**{k:v for k,v in read('slicer/common/printer.json').items()
               if k in ['gcode_flavor','autoemit_temperature_commands','use_firmware_retraction','use_volumetric_e',
                        'retract_layer_change','retract_before_wipe','wipe']}, **tool['settings']},indent=2)+'\n').encode(),
-            'README.md':text('slicer/README.md').encode()}
+            'README.md':text('slicer/README.md').replace('../LICENSE.md','LICENSE.md').replace('../THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md').encode()}
 
 def macro_files():
     files = {name:text('macros/'+name).encode() for name in ['stop.g','cancel.g','adaptive_mesh.g','g32_u.g','axis_test.g']}
     for ident in ['griffin','griffin-high-flow','griffin-ultra']:
         head = component('config/toolheads',ident)
         files['bed-'+ident+'.g'] = bed_wrapper(head,head['nozzle_insets_mm'])
-    files['README.md'] = text('macros/README.md').encode()
+    files['README.md'] = text('macros/README.md').replace('../LICENSE.md','LICENSE.md').replace('../THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md').encode()
+    files.update(licensing_files())
     return files
 
 def starter_filament(material, head, head_id):
@@ -149,6 +153,10 @@ def starter_groups():
 def starter_bundle():
     groups = starter_groups()
     value = '# Hjort Creations Modix BIG starter profiles. Import Config Bundle in PrusaSlicer.\n'
+    value += '# Original Hjort Creations contributions: own-printer use, including business use, is permitted.\n'
+    value += '# Commercial redistribution or bundling requires separate permission; earlier and third-party rights remain unchanged.\n'
+    value += '# Terms: https://github.com/HjortCreations/modix-big-series/blob/v0.3.7/LICENSE.md\n'
+    value += '# Notices: https://github.com/HjortCreations/modix-big-series/blob/v0.3.7/THIRD_PARTY_NOTICES.md\n'
     for name,settings in groups.items():
         value += '\n['+name+']\n'+''.join(f'{k} = {v}\n' for k,v in sorted(settings.items()))
     return value.encode('utf-8')
@@ -218,6 +226,7 @@ def compose(recipe):
         bundle += '\n[' + group + ':' + names[group] + ']\n'
         bundle += ''.join(f'{k} = {v}\n' for k,v in sorted(settings.items()))
     files['PrusaSlicer-bundle.ini'] = bundle.encode()
+    files.update(licensing_files())
     manifest = {'schema_version':1, 'recipe':recipe,
                 'requires':{'RRF_minimum':'3.5.3', 'kinematics':'Cartesian XYZ, BLTouch0, four independent Z motors',
                             'primary_tool_heaters':head['required_primary_tool_heaters'],
@@ -258,6 +267,11 @@ def main():
     parser.add_argument('--profiles', action='store_true')
     parser.add_argument('--starter', action='store_true')
     args = parser.parse_args()
+    if args.all or args.starter or args.macros or args.profiles:
+        destination = ROOT/'dist'
+        destination.mkdir(parents=True,exist_ok=True)
+        for name,value in licensing_files().items():
+            (destination/name).write_bytes(value)
     if args.all or args.starter:
         destination = ROOT/'dist'/read('slicer/starter.json')['filename']
         destination.parent.mkdir(parents=True,exist_ok=True)

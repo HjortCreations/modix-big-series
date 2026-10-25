@@ -4,9 +4,14 @@ Choose a profile by **toolhead, nozzle, material and print process**.
 Changing from BIG-Meter to BIG-60 or BIG-180X does not create a new ULTRA material or print process.
 The printer's own preset supplies its work envelope, hardware limits and calibration.
 
+Hjort Creations' original contributions are provided under the [Own-Printer Use License](../LICENSE.md).
+Use on your own printers, including business use and paid printing, is permitted.
+Commercial redistribution requires separate permission. Earlier and third-party rights remain unchanged;
+see [third-party notices](../THIRD_PARTY_NOTICES.md). Both notices accompany profile ZIPs.
+
 ## Download and import the starter bundle
 
-**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.6/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Hjort-Creations-Modix-BIG-PrusaSlicer.ini](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.7/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 1. In PrusaSlicer 2.9.6, choose **File > Import > Import Config Bundle** and select the downloaded file.
 2. Select your **Hjort Creations - model - head/nozzle** printer preset.

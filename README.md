@@ -1,11 +1,17 @@
-# Modix BIG Series
+# Modix BIG Series by Hjort Creations
 
 Reusable printer macros and independent slicer profiles for the Modix BIG series.
 Choose the feature you need. A machine example's name does not limit a shared feature to that model or nozzle.
 
+Maintained by **[Hjort Creations](https://hjortcreations.se)**, based on practical printer setup, service and tuning.
+This is an independent project; it is not an official Modix firmware release.
+
+**Want help with your printer?** We offer paid setup, service, troubleshooting, slicer tuning and training
+for individuals, companies and organisations. [See how we can help](#setup-service-and-tuning).
+
 ## Get started in PrusaSlicer
 
-**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.5/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
+**[Download the ready-to-import Hjort Creations BIG starter bundle](https://github.com/HjortCreations/modix-big-series/releases/download/v0.3.6/Hjort-Creations-Modix-BIG-PrusaSlicer.ini)**
 
 Import the file with **File > Import > Import Config Bundle**. Select your printer/head,
 the **Hjort Creations - BIG Starter - Layer 0.4** print profile and a matching filament profile.
@@ -54,7 +60,7 @@ preserve earlier, more specific setups for users who already have a printer pres
 The printer preset supplies machine geometry and hardware limits separately.
 The profile packages contain print/material presets, shared start/end snippets and head settings without firmware or model geometry.
 
-[Slicer instructions](slicer/README.md) · [Download profile- ZIP packages](https://github.com/HjortCreations/modix-big-series/releases)
+[Slicer instructions](slicer/README.md) · [Download profile ZIP packages](https://github.com/HjortCreations/modix-big-series/releases)
 
 The current ULTRA 1.8 mm/ePLA defaults are 100 mm³/s, 235/215 °C, PA 0.035,
 print/travel acceleration 250/800 mm/s², 1.0 mm layers and a 1.2 mm first layer.
@@ -67,8 +73,26 @@ Keep each machine's working configuration: dimensions, wiring, motor mapping, ha
 Individual calibration and network settings stay outside this repository.
 
 [Machine combination examples](recipes/README.md) assemble the independent components with particular geometry and homing references.
-The example- ZIPs are convenient complete combinations. **They are not a list of the models that can use the shared macros or slicer profiles.**
+The example ZIPs are convenient complete combinations. **They are not a list of the models that can use the shared macros or slicer profiles.**
 Their newly assembled files have not been physically commissioned as complete packages.
+
+## Setup, service and tuning
+
+**Hjort Creations offers paid, hands-on help getting your printer ready for everyday use.**
+We work with private owners, businesses, universities and other organisations.
+
+- Printer assembly, commissioning, mechanical service and troubleshooting.
+- Firmware and macro setup for the machine's actual hardware.
+- Slicer profiles, material tuning and operator training.
+- CAD, prototypes and large-format 3D printing when you need parts made.
+
+For help with a Modix printer, include the model, controller/firmware, printhead, nozzle size and what you want to improve.
+We can then agree the scope and provide a quote. Service work and individual support are arranged separately from the repository downloads.
+
+**[Contact Per about your printer](https://www.hjortcreations.com/kontakt)** ·
+[Services](https://www.hjortcreations.com/tjanster) ·
+[Service agreements](https://www.hjortcreations.com/butik/serviceavtal-3d-skrivare) ·
+[Website and shop](https://hjortcreations.se)
 
 ## Build and maintain
 

@@ -35,8 +35,7 @@ Motion limits come from the selected motion component. The example requires sepa
 A new BIG size does not need a new stop.g, adaptive-mesh file or head/material profile.
 Add a model geometry or full integration example only when that separate preset/overlay is needed and its geometry, motor order, homing and clearance are known.
 
-Original machine baselines, individual calibration, vendor references, service/test evidence and earlier
-calibration tools remain in the [retired private service archive](https://github.com/HjortCreations/modix-big120z-reprapfirmware).
-The reusable production components were migrated here and subsequently improved; historical experiments
-were deliberately not all promoted into universal defaults. Keep current development and downloads here.
-The archive's files and Git history are preserved for reference, without adding its customer data to this project.
+Keep original machine baselines, individual calibration, vendor references and service/test evidence
+in private service records outside this repository. Earlier service archives remain private.
+The reusable components are maintained here; historical experiments are not universal defaults.
+Public installation instructions and downloads must be usable without access to a private archive.
